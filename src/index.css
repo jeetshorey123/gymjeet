@@ -59,7 +59,7 @@ button.secondary:hover {
   color: var(--bg-dark);
 }
 
-input[type="text"], input[type="password"], input[type="number"], input[type="date"] {
+input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
   width: 100%;
   padding: 10px;
   background: var(--bg-input);
@@ -67,6 +67,7 @@ input[type="text"], input[type="password"], input[type="number"], input[type="da
   color: white;
   border-radius: 4px;
   font-family: 'Inter', sans-serif;
+  font-size: 16px;
 }
 
 input:focus {
@@ -170,6 +171,12 @@ input[type="checkbox"]:checked::after {
   gap: 20px;
 }
 
+.date-day-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
   .grid-2 {
     grid-template-columns: 1fr;
@@ -190,5 +197,9 @@ input[type="checkbox"]:checked::after {
   }
   .nav-links a {
     margin-left: 0;
+  }
+  .date-day-row {
+    flex-direction: column;
+    gap: 10px;
   }
 }

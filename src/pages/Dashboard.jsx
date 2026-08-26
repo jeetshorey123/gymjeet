@@ -321,7 +321,7 @@ export default function Dashboard({ user }) {
             <Calendar color="#FF6B00" /> Log Workout
           </h2>
           
-          <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+          <div className="date-day-row">
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>Date</label>
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -331,7 +331,6 @@ export default function Dashboard({ user }) {
               <select 
                 value={selectedDay} 
                 onChange={(e) => setSelectedDay(parseInt(e.target.value))}
-                style={{ width: '100%', padding: '10px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'white', borderRadius: '4px' }}
               >
                 {blueprint.days.map(d => (
                   <option key={d.id} value={d.id}>Day {d.id} - {d.type}</option>

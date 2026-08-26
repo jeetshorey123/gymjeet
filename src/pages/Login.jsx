@@ -11,9 +11,12 @@ export default function Login({ onLogin }) {
     e.preventDefault()
     setError('')
     
+    const userLower = username.toLowerCase()
+    const passLower = password.toLowerCase()
+
     // As requested, simple auth checking 'jeet' or 'guest'
-    if ((username === 'jeet' && password === 'jeet') || 
-        (username === 'guest' && password === 'guest')) {
+    if ((userLower === 'jeet' && passLower === 'jeet') || 
+        (userLower === 'guest' && passLower === 'guest')) {
       
       // Let's also check if user exists in our supabase users table (since we seeded it)
       // If we don't have supabase connected yet, fallback to direct login for dev
@@ -21,8 +24,8 @@ export default function Login({ onLogin }) {
         const { data, error } = await supabase
           .from('users')
           .select('*')
-          .eq('username', username)
-          .eq('password', password)
+          .eq('username', userLower)
+          .eq('password', passLower)
           .single()
         
         if (data) {
