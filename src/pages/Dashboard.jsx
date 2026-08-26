@@ -22,7 +22,7 @@ export default function Dashboard({ user }) {
         const numSets = parseInt(ex.sets) || 1
         const setsData = Array.from({ length: numSets }).map(() => ({
           reps: ex.reps || '',
-          weight: '',
+          weight: ex.isWarmup ? '' : 10,
           completed: false
         }))
         return {
@@ -97,12 +97,12 @@ export default function Dashboard({ user }) {
           setSessionId(null)
           if (currentPlan) {
             const allList = [...(currentPlan.warmup || []), ...(currentPlan.exercises || [])]
-            setExercises(allList.map(ex => {
+              setExercises(allList.map(ex => {
               const numSets = parseInt(ex.sets) || 1
               return {
                 ...ex,
                 setsData: Array.from({ length: numSets }).map(() => ({
-                  reps: ex.reps || '', weight: '', completed: false
+                  reps: ex.reps || '', weight: ex.isWarmup ? '' : 10, completed: false
                 }))
               }
             }))
