@@ -173,7 +173,7 @@ export default function Dashboard({ user }) {
         }, { onConflict: 'user_id,date' })
       }
 
-      const allCompleted = exercises.every(ex => ex.setsData.every(s => s.completed));
+      const isCompleted = exercises.some(ex => ex.setsData.some(s => s.completed));
       const cals = calculateCalories();
 
       const { data: sessionData, error: sessionError } = await supabase
@@ -182,7 +182,7 @@ export default function Dashboard({ user }) {
           user_id: user.id,
           date: date,
           day_plan: `DAY ${selectedDay}`,
-          completed: allCompleted,
+          completed: isCompleted,
           calories_burned: cals
         }, { onConflict: 'user_id,date' })
         .select()
@@ -201,7 +201,7 @@ export default function Dashboard({ user }) {
           exercise_name: ex.name,
           target_muscle: ex.muscle,
           is_warmup: !!ex.isWarmup,
-          completed: ex.setsData.every(s => s.completed)
+          completed: ex.setsData.some(s => s.completed)
         }))
         
         const { data: insertedLogs, error: logError } = await supabase.from('exercise_logs').insert(logsToInsert).select()

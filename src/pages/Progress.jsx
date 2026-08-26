@@ -39,29 +39,33 @@ export default function Progress({ user }) {
         const { data: wData } = await supabase.from('daily_weights').select('*').eq('user_id', user.id).order('date', { ascending: true })
         if (wData) setWeights(wData)
 
-        const { data: sData } = await supabase.from('workout_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false })
-        if (sData) setSessions(sData)
+        const { data: sessionData, error } = await supabase
+          .from('workout_sessions')
+          .select(`
+            *,
+            exercise_logs (
+              *,
+              exercise_sets (*)
+            )
+          `)
+          .eq('user_id', user.id)
+          .order('date', { ascending: false })
 
-        if (sData && sData.length > 0) {
-          const sessionIds = sData.map(s => s.id)
-          const { data: lData } = await supabase.from('exercise_logs').select('*').in('session_id', sessionIds)
+        if (error) throw error;
+
+        if (sessionData) {
+          setSessions(sessionData)
           
-          if (lData && lData.length > 0) {
-            const logIds = lData.map(l => l.id)
-            const { data: setsData } = await supabase.from('exercise_sets').select('*').in('log_id', logIds).order('set_number', { ascending: true })
-            
-            // Attach sets to logs for UI compatibility
-            const enrichedLogs = lData.map(log => {
-              const mySets = (setsData || []).filter(s => s.log_id === log.id)
-              return {
-                ...log,
-                sets_data: mySets
-              }
-            })
-            setLogs(enrichedLogs)
-          } else {
-            setLogs([])
-          }
+          const allLogs = []
+          sessionData.forEach(session => {
+            if (session.exercise_logs) {
+              session.exercise_logs.forEach(log => {
+                log.sets_data = (log.exercise_sets || []).sort((a,b) => a.set_number - b.set_number)
+                allLogs.push(log)
+              })
+            }
+          })
+          setLogs(allLogs)
         }
       } catch (err) {
         console.error(err)
