@@ -25,6 +25,7 @@ export default function Progress({ user }) {
   const [weights, setWeights] = useState([])
   const [sessions, setSessions] = useState([])
   const [logs, setLogs] = useState([])
+  const [loading, setLoading] = useState(true)
   
   const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 14
@@ -33,7 +34,12 @@ export default function Progress({ user }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (user.id === 'local-id') return;
+      if (user.id === 'local-id') {
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(true);
 
       try {
         const { data: wData } = await supabase.from('daily_weights').select('*').eq('user_id', user.id).order('date', { ascending: true })
@@ -69,6 +75,8 @@ export default function Progress({ user }) {
         }
       } catch (err) {
         console.error(err)
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
@@ -141,7 +149,7 @@ export default function Progress({ user }) {
       "Triceps": "triceps",
       "Forearms": "forearm",
       "Leg Mass": "quadriceps", "Quads": "quadriceps", "Func. Legs": "quadriceps", "Full Body": "quadriceps", "Legs": "quadriceps",
-      "Hamstrings": "hamstrings", "Power": "hamstrings", "Post. Chain": "hamstrings",
+      "Hamstrings": "hamstring", "Power": "hamstring", "Post. Chain": "hamstring",
       "Glutes": "gluteal",
       "Calves": "calves",
       "Delts": "front-deltoids", "Side Delts": "front-deltoids",
@@ -161,6 +169,14 @@ export default function Progress({ user }) {
   const selectedSessionData = selectedSessionId ? validSessions.find(s => s.id === selectedSessionId) : null
   const selectedSessionLogs = selectedSessionId ? logs.filter(l => l.session_id === selectedSessionId) : []
   const selectedSessionWeight = selectedSessionData ? validWeights.find(w => w.date === selectedSessionData.date) : null
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <h2 style={{ color: 'var(--accent-orange)' }}>Loading Progress...</h2>
+      </div>
+    )
+  }
 
   return (
     <div>
