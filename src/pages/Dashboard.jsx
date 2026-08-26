@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { blueprint } from '../data/blueprint'
-import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2 } from 'lucide-react'
+import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus } from 'lucide-react'
 
 export default function Dashboard({ user }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -103,6 +103,24 @@ export default function Dashboard({ user }) {
   const handleSetChange = (exIndex, setIndex, field, value) => {
     const newEx = [...exercises]
     newEx[exIndex].setsData[setIndex][field] = value
+    setExercises(newEx)
+  }
+
+  const addSet = (exIndex) => {
+    const newEx = [...exercises]
+    const currentSets = newEx[exIndex].setsData;
+    const lastSet = currentSets[currentSets.length - 1];
+    currentSets.push({
+      reps: lastSet ? lastSet.reps : '',
+      weight: lastSet ? lastSet.weight : '',
+      completed: false
+    })
+    setExercises(newEx)
+  }
+
+  const removeSet = (exIndex, setIndex) => {
+    const newEx = [...exercises]
+    newEx[exIndex].setsData.splice(setIndex, 1)
     setExercises(newEx)
   }
 
@@ -255,15 +273,16 @@ export default function Dashboard({ user }) {
                     </div>
                   </div>
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: '50px 1fr 1fr 50px', gap: '10px', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 1fr 40px 30px', gap: '10px', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>
                     <div>SET</div>
                     <div>REPS</div>
                     <div>WEIGHT (kg)</div>
                     <div style={{ textAlign: 'center' }}>DONE</div>
+                    <div></div>
                   </div>
                   
                   {ex.setsData.map((set, setIdx) => (
-                    <div key={setIdx} style={{ display: 'grid', gridTemplateColumns: '50px 1fr 1fr 50px', gap: '10px', alignItems: 'center', marginBottom: '5px' }}>
+                    <div key={setIdx} style={{ display: 'grid', gridTemplateColumns: '40px 1fr 1fr 40px 30px', gap: '10px', alignItems: 'center', marginBottom: '5px' }}>
                       <div style={{ fontWeight: 'bold' }}>{setIdx + 1}</div>
                       <input 
                         type="text" 
@@ -286,8 +305,21 @@ export default function Dashboard({ user }) {
                           onChange={(e) => handleSetChange(exIdx, setIdx, 'completed', e.target.checked)} 
                         />
                       </div>
+                      <button 
+                        onClick={() => removeSet(exIdx, setIdx)}
+                        style={{ padding: '5px', background: 'transparent', color: 'var(--text-muted)' }}
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   ))}
+                  <button 
+                    onClick={() => addSet(exIdx)}
+                    style={{ marginTop: '10px', padding: '5px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                    className="secondary"
+                  >
+                    <Plus size={14} /> Add Set
+                  </button>
                 </div>
               ))}
             </div>

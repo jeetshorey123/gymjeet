@@ -7,10 +7,10 @@ import { Activity, Flame, TrendingDown, ChevronLeft, ChevronRight, Calendar } fr
 // Helper to format date strings for different intervals
 const formatInterval = (dateStr, interval) => {
   const d = new Date(dateStr)
-  if (interval === 'Daily') return d.toISOString().split('T')[0]
+  if (interval === 'Daily' || interval === 'Custom') return d.toISOString().split('T')[0]
   if (interval === 'Weekly') {
     const firstDay = new Date(d.setDate(d.getDate() - d.getDay()))
-    return firstDay.toISOString().split('T')[0] // Returns Sunday of that week
+    return firstDay.toISOString().split('T')[0]
   }
   if (interval === 'Monthly') return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
   if (interval === 'Yearly') return `${d.getFullYear()}`
@@ -19,6 +19,8 @@ const formatInterval = (dateStr, interval) => {
 
 export default function Progress({ user }) {
   const [timeFilter, setTimeFilter] = useState('Daily')
+  const [customStart, setCustomStart] = useState('')
+  const [customEnd, setCustomEnd] = useState('')
   
   const [weights, setWeights] = useState([])
   const [sessions, setSessions] = useState([])
@@ -31,18 +33,15 @@ export default function Progress({ user }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (user.id === 'local-id') return; // Skip if no real DB connection
+      if (user.id === 'local-id') return;
 
       try {
-        // Fetch Weights
         const { data: wData } = await supabase.from('daily_weights').select('*').eq('user_id', user.id).order('date', { ascending: true })
         if (wData) setWeights(wData)
 
-        // Fetch Sessions
         const { data: sData } = await supabase.from('workout_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false })
         if (sData) setSessions(sData)
 
-        // Fetch ALL Logs for heatmaps and drill-down
         if (sData && sData.length > 0) {
           const sessionIds = sData.map(s => s.id)
           const { data: lData } = await supabase.from('exercise_logs').select('*').in('session_id', sessionIds)
@@ -55,10 +54,21 @@ export default function Progress({ user }) {
     fetchData()
   }, [user.id])
 
+  // Apply Custom Date filtering
+  const validWeights = useMemo(() => {
+    if (timeFilter !== 'Custom') return weights;
+    return weights.filter(w => (!customStart || w.date >= customStart) && (!customEnd || w.date <= customEnd));
+  }, [weights, timeFilter, customStart, customEnd])
+
+  const validSessions = useMemo(() => {
+    if (timeFilter !== 'Custom') return sessions;
+    return sessions.filter(s => (!customStart || s.date >= customStart) && (!customEnd || s.date <= customEnd));
+  }, [sessions, timeFilter, customStart, customEnd])
+
   // Aggregate Data based on Time Filter
   const aggregatedWeight = useMemo(() => {
     const groups = {}
-    weights.forEach(w => {
+    validWeights.forEach(w => {
       const key = formatInterval(w.date, timeFilter)
       if (!groups[key]) groups[key] = []
       groups[key].push(Number(w.weight))
@@ -67,11 +77,11 @@ export default function Progress({ user }) {
       const avg = groups[date].reduce((a,b)=>a+b,0) / groups[date].length
       return { date, weight: avg.toFixed(1) }
     })
-  }, [weights, timeFilter])
+  }, [validWeights, timeFilter])
 
   const aggregatedWorkouts = useMemo(() => {
     const groups = {}
-    sessions.forEach(s => {
+    validSessions.forEach(s => {
       const key = formatInterval(s.date, timeFilter)
       if (!groups[key]) groups[key] = 0
       groups[key] += Number(s.calories_burned || 0)
@@ -79,26 +89,26 @@ export default function Progress({ user }) {
     return Object.keys(groups).sort().map(date => ({
       date, calories: groups[date]
     }))
-  }, [sessions, timeFilter])
+  }, [validSessions, timeFilter])
 
   const filteredLogs = useMemo(() => {
-    // If we want to filter heatmap by time, we find which sessions match the time frame
-    // For simplicity, let's just show all-time on heatmap, or restrict based on something else
-    // But user asked: "heat map of the muscle i can see the date wise , wekkly , monthly"
-    // Let's filter sessions that fall within the most recent "timeFilter" period.
-    if (!sessions.length) return []
+    if (!validSessions.length) return []
     
-    // Find the most recent date interval
-    const latestSession = sessions[0]
+    if (timeFilter === 'Custom') {
+      const validSessionIds = validSessions.map(s => s.id)
+      return logs.filter(l => validSessionIds.includes(l.session_id) && l.completed)
+    }
+
+    const latestSession = validSessions[0]
     if (!latestSession) return logs
     
     const latestInterval = formatInterval(latestSession.date, timeFilter)
-    const validSessionIds = sessions
+    const validSessionIds = validSessions
       .filter(s => formatInterval(s.date, timeFilter) === latestInterval)
       .map(s => s.id)
       
     return logs.filter(l => validSessionIds.includes(l.session_id) && l.completed)
-  }, [sessions, logs, timeFilter])
+  }, [validSessions, logs, timeFilter])
 
   const muscleData = useMemo(() => {
     const mapping = {
@@ -124,20 +134,20 @@ export default function Progress({ user }) {
   }, [filteredLogs])
 
   // Pagination for Detailed History
-  const paginatedSessions = sessions.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
-  const totalPages = Math.ceil(sessions.length / itemsPerPage)
+  const paginatedSessions = validSessions.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
+  const totalPages = Math.ceil(validSessions.length / itemsPerPage)
 
-  const selectedSessionData = selectedSessionId ? sessions.find(s => s.id === selectedSessionId) : null
+  const selectedSessionData = selectedSessionId ? validSessions.find(s => s.id === selectedSessionId) : null
   const selectedSessionLogs = selectedSessionId ? logs.filter(l => l.session_id === selectedSessionId) : []
-  const selectedSessionWeight = selectedSessionData ? weights.find(w => w.date === selectedSessionData.date) : null
+  const selectedSessionWeight = selectedSessionData ? validWeights.find(w => w.date === selectedSessionData.date) : null
 
   return (
     <div>
       {/* Filters */}
-      <div className="card" style={{ display: 'flex', gap: '10px', marginBottom: '20px', alignItems: 'center' }}>
+      <div className="card" style={{ display: 'flex', gap: '10px', marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
         <Calendar size={20} color="var(--accent-orange)" />
         <strong>View By:</strong>
-        {['Daily', 'Weekly', 'Monthly', 'Yearly'].map(tf => (
+        {['Daily', 'Weekly', 'Monthly', 'Yearly', 'Custom'].map(tf => (
           <button 
             key={tf} 
             className={timeFilter === tf ? '' : 'secondary'} 
@@ -147,6 +157,14 @@ export default function Progress({ user }) {
             {tf}
           </button>
         ))}
+        {timeFilter === 'Custom' && (
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginLeft: 'auto' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>From:</span>
+            <input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} style={{ padding: '5px', fontSize: '12px' }} />
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>To:</span>
+            <input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} style={{ padding: '5px', fontSize: '12px' }} />
+          </div>
+        )}
       </div>
 
       <div className="grid-2" style={{ marginBottom: '20px' }}>
@@ -185,8 +203,8 @@ export default function Progress({ user }) {
       <div className="card" style={{ marginBottom: '20px' }}>
         <h3 style={{ marginBottom: '20px' }}>Detailed Workout History</h3>
         
-        {sessions.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)' }}>No workouts logged yet.</p>
+        {validSessions.length === 0 ? (
+          <p style={{ color: 'var(--text-muted)' }}>No workouts found for this period.</p>
         ) : (
           <div>
             <div style={{ overflowX: 'auto' }}>
@@ -212,7 +230,7 @@ export default function Progress({ user }) {
                     const warmupsDone = warmups.filter(l => l.completed).length
                     const exDone = ex.filter(l => l.completed).length
                     
-                    const sessionWeight = weights.find(w => w.date === session.date)?.weight || '-'
+                    const sessionWeight = validWeights.find(w => w.date === session.date)?.weight || '-'
                     
                     return (
                       <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)', background: selectedSessionId === session.id ? 'rgba(255, 107, 0, 0.1)' : 'transparent' }}>
@@ -303,10 +321,10 @@ export default function Progress({ user }) {
         {/* 3D Muscle Heatmap */}
         <div className="card">
           <h3 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Activity color="#FF6B00" /> Target Heatmap (Latest {timeFilter})
+            <Activity color="#FF6B00" /> Target Heatmap ({timeFilter === 'Custom' ? 'Custom Range' : 'Latest ' + timeFilter})
           </h3>
           <p style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '14px' }}>
-            Visualizes muscle fatigue for the most recent period based on your active filter.
+            Visualizes muscle fatigue for the {timeFilter === 'Custom' ? 'selected custom dates' : 'most recent period based on your active filter'}.
           </p>
           
           <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' }}>
