@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { blueprint } from '../data/blueprint'
-import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus, Activity } from 'lucide-react'
+import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus, Activity, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function Dashboard({ user }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -11,6 +11,8 @@ export default function Dashboard({ user }) {
   const [sessionSaved, setSessionSaved] = useState(false)
   const [sessionId, setSessionId] = useState(null)
   const [recentWorkouts, setRecentWorkouts] = useState([])
+  const [recentPage, setRecentPage] = useState(0)
+  const [totalRecent, setTotalRecent] = useState(0)
 
   const currentPlan = blueprint.days.find(d => d.id === selectedDay)
 
@@ -36,6 +38,55 @@ export default function Dashboard({ user }) {
     }
   }, [selectedDay, currentPlan])
 
+  // Fetch recent workouts with pagination
+  useEffect(() => {
+    const fetchRecent = async () => {
+      if (user.id === 'local-id') return;
+      try {
+        const { data: recentData, count } = await supabase
+          .from('workout_sessions')
+          .select(`
+            date, day_plan, completed,
+            exercise_logs (
+              is_warmup,
+              completed
+            )
+          `, { count: 'exact' })
+          .eq('user_id', user.id)
+          .order('date', { ascending: false })
+          .range(recentPage * 10, (recentPage + 1) * 10 - 1)
+        
+        if (recentData) {
+          const dates = recentData.map(d => d.date)
+          const { data: weightData } = await supabase
+            .from('daily_weights')
+            .select('date, weight')
+            .in('date', dates)
+            .eq('user_id', user.id)
+            
+          const enriched = recentData.map(session => {
+            const w = weightData?.find(wd => wd.date === session.date)
+            const warmups = session.exercise_logs?.filter(l => l.is_warmup) || []
+            const exercises = session.exercise_logs?.filter(l => !l.is_warmup) || []
+            return {
+              ...session,
+              weight: w ? w.weight : '-',
+              warmupsDone: warmups.filter(l => l.completed).length,
+              warmupsTotal: warmups.length,
+              exDone: exercises.filter(l => l.completed).length,
+              exTotal: exercises.length
+            }
+          })
+          setRecentWorkouts(enriched)
+          if (count !== null) setTotalRecent(count)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    fetchRecent()
+  }, [user.id, recentPage, sessionSaved])
+
   // Fetch existing data for this date
   useEffect(() => {
     const fetchExistingData = async () => {
@@ -59,15 +110,6 @@ export default function Dashboard({ user }) {
           .eq('date', date)
           .single()
 
-        const { data: recentData } = await supabase
-          .from('workout_sessions')
-          .select('date, day_plan, completed')
-          .eq('user_id', user.id)
-          .order('date', { ascending: false })
-          .limit(10)
-        
-        if (recentData) setRecentWorkouts(recentData)
-        
         if (sessionData) {
           setSessionSaved(true)
           setSessionId(sessionData.id)
@@ -421,21 +463,54 @@ export default function Dashboard({ user }) {
           
           <div className="card" style={{ marginTop: '20px' }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <Activity color="#FF6B00" /> Recent Workouts (Last 10 Days)
+              <Activity color="#FF6B00" /> Recent Workouts
             </h2>
             {recentWorkouts.length === 0 ? (
               <p style={{ color: 'var(--text-muted)' }}>No recent workouts found.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {recentWorkouts.map((session, idx) => (
-                  <div key={idx} style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: session.completed ? '4px solid #4caf50' : '4px solid #d32f2f' }}>
-                    <div>
-                      <strong style={{ color: 'white' }}>{session.date}</strong>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '5px' }}>{session.day_plan}</div>
+              <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {recentWorkouts.map((session, idx) => (
+                    <div key={idx} style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: session.completed ? '4px solid #4caf50' : '4px solid #d32f2f' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <strong style={{ color: 'white' }}>{session.date}</strong>
+                          <span style={{ fontSize: '12px', color: 'var(--accent-orange)' }}>{session.weight !== '-' ? `${session.weight} kg` : '-'}</span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '5px' }}>{session.day_plan}</div>
+                        <div style={{ fontSize: '11px', color: '#a0a0a0', marginTop: '5px', display: 'flex', gap: '10px' }}>
+                          <span>Warmups: {session.warmupsDone}/{session.warmupsTotal}</span>
+                          <span>Exercises: {session.exDone}/{session.exTotal}</span>
+                        </div>
+                      </div>
+                      <div style={{ marginLeft: '15px' }}>
+                        {session.completed ? <CheckCircle size={20} color="#4caf50" /> : <span style={{fontSize: '12px', color: '#d32f2f'}}>Missed</span>}
+                      </div>
                     </div>
-                    {session.completed ? <CheckCircle size={20} color="#4caf50" /> : <span style={{fontSize: '12px', color: '#d32f2f'}}>Incomplete</span>}
-                  </div>
-                ))}
+                  ))}
+                </div>
+                {/* Pagination */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px' }}>
+                  <button 
+                    className="secondary" 
+                    onClick={() => setRecentPage(p => Math.max(0, p - 1))} 
+                    disabled={recentPage === 0}
+                    style={{ padding: '5px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    <ChevronLeft size={14} /> Prev
+                  </button>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    Page {recentPage + 1} of {Math.ceil(totalRecent / 10) || 1}
+                  </span>
+                  <button 
+                    className="secondary" 
+                    onClick={() => setRecentPage(p => Math.min(Math.ceil(totalRecent / 10) - 1, p + 1))} 
+                    disabled={recentPage >= Math.ceil(totalRecent / 10) - 1}
+                    style={{ padding: '5px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    Next <ChevronRight size={14} />
+                  </button>
+                </div>
               </div>
             )}
           </div>
