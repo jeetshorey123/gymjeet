@@ -52,7 +52,7 @@ export default function Login({ onLogin }) {
     }}>
       <div className="card" style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}>
         <Activity color="#FF6B00" size={48} style={{ margin: '0 auto 20px' }} />
-        <h1 style={{ marginBottom: '30px' }}>FitPulse Login</h1>
+        <h1 style={{ marginBottom: '30px' }}>JeetFit Login</h1>
         
         {error && <div style={{ color: '#FF6B00', marginBottom: '15px' }}>{error}</div>}
         

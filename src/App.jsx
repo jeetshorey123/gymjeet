@@ -12,7 +12,7 @@ function Navigation({ onLogout }) {
     <nav className="nav">
       <div className="nav-brand">
         <Activity color="#FF6B00" size={28} />
-        FITPULSE GYM
+        JEETFIT
       </div>
       <div className="nav-links">
         <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Dashboard</Link>
