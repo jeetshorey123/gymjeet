@@ -45,7 +45,23 @@ export default function Progress({ user }) {
         if (sData && sData.length > 0) {
           const sessionIds = sData.map(s => s.id)
           const { data: lData } = await supabase.from('exercise_logs').select('*').in('session_id', sessionIds)
-          if (lData) setLogs(lData)
+          
+          if (lData && lData.length > 0) {
+            const logIds = lData.map(l => l.id)
+            const { data: setsData } = await supabase.from('exercise_sets').select('*').in('log_id', logIds).order('set_number', { ascending: true })
+            
+            // Attach sets to logs for UI compatibility
+            const enrichedLogs = lData.map(log => {
+              const mySets = (setsData || []).filter(s => s.log_id === log.id)
+              return {
+                ...log,
+                sets_data: mySets
+              }
+            })
+            setLogs(enrichedLogs)
+          } else {
+            setLogs([])
+          }
         }
       } catch (err) {
         console.error(err)
@@ -125,7 +141,8 @@ export default function Progress({ user }) {
       "Glutes": "gluteal",
       "Calves": "calves",
       "Delts": "front-deltoids", "Side Delts": "front-deltoids",
-      "Rear Delts": "back-deltoids"
+      "Rear Delts": "back-deltoids",
+      "Fat Burn": "obliques", "Steady Burn": "obliques", "Flush": "quadriceps", "Cardio": "obliques"
     }
     return filteredLogs.map((log, i) => ({
       name: log.exercise_name || `Ex ${i}`,
@@ -296,16 +313,16 @@ export default function Progress({ user }) {
                         <tr>
                           <th style={{ textAlign: 'left' }}>Set</th>
                           <th style={{ textAlign: 'left' }}>Reps</th>
-                          <th style={{ textAlign: 'left' }}>Weight</th>
+                          <th style={{ textAlign: 'left' }}>Weight (kg)</th>
                           <th style={{ textAlign: 'left' }}>Done</th>
                         </tr>
                       </thead>
                       <tbody>
                         {(log.sets_data || []).map((set, sIdx) => (
                           <tr key={sIdx}>
-                            <td>{sIdx + 1}</td>
+                            <td>{set.set_number}</td>
                             <td>{set.reps}</td>
-                            <td>{set.weight || '-'}</td>
+                            <td>{set.weight_kg || '-'}</td>
                             <td>{set.completed ? '✓' : '✗'}</td>
                           </tr>
                         ))}

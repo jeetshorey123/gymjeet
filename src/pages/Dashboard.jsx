@@ -69,12 +69,27 @@ export default function Dashboard({ user }) {
             .eq('session_id', sessionData.id)
             
           if (logsData && logsData.length > 0) {
+            const logIds = logsData.map(l => l.id)
+            const { data: setsData } = await supabase
+              .from('exercise_sets')
+              .select('*')
+              .in('log_id', logIds)
+              .order('set_number', { ascending: true })
+
             setExercises(prev => prev.map(ex => {
               const log = logsData.find(l => l.exercise_name === ex.name && !!l.is_warmup === !!ex.isWarmup)
-              return log ? {
-                ...ex,
-                setsData: log.sets_data || ex.setsData
-              } : ex
+              if (log && setsData) {
+                const mySets = setsData.filter(s => s.log_id === log.id).map(s => ({
+                  reps: s.reps || '',
+                  weight: s.weight_kg || '',
+                  completed: s.completed
+                }))
+                return {
+                  ...ex,
+                  setsData: mySets.length > 0 ? mySets : ex.setsData
+                }
+              }
+              return ex
             }))
           }
         } else {
@@ -130,7 +145,7 @@ export default function Dashboard({ user }) {
       ex.setsData.forEach(set => {
         if (set.completed) {
           if (ex.isWarmup) {
-            totalCals += 10; // flat 10 cals per warmup set
+            totalCals += 10;
           } else {
             const w = parseFloat(set.weight) || 0;
             const r = parseInt(set.reps) || 0;
@@ -177,18 +192,43 @@ export default function Dashboard({ user }) {
 
       if (sessionData) {
         setSessionId(sessionData.id)
+        // Delete old logs (cascade deletes sets)
         await supabase.from('exercise_logs').delete().eq('session_id', sessionData.id)
         
-        const logs = exercises.map(ex => ({
+        // 1. Insert logs
+        const logsToInsert = exercises.map(ex => ({
           session_id: sessionData.id,
           exercise_name: ex.name,
           target_muscle: ex.muscle,
           is_warmup: !!ex.isWarmup,
-          sets_data: ex.setsData,
           completed: ex.setsData.every(s => s.completed)
         }))
         
-        await supabase.from('exercise_logs').insert(logs)
+        const { data: insertedLogs, error: logError } = await supabase.from('exercise_logs').insert(logsToInsert).select()
+        
+        if (logError) throw logError;
+
+        // 2. Insert sets
+        const setsToInsert = []
+        exercises.forEach(ex => {
+          const matchingLog = insertedLogs.find(l => l.exercise_name === ex.name && !!l.is_warmup === !!ex.isWarmup)
+          if (matchingLog) {
+            ex.setsData.forEach((set, idx) => {
+              setsToInsert.push({
+                log_id: matchingLog.id,
+                set_number: idx + 1,
+                reps: parseInt(set.reps) || 0,
+                weight_kg: parseFloat(set.weight) || null,
+                completed: set.completed
+              })
+            })
+          }
+        })
+
+        if (setsToInsert.length > 0) {
+          const { error: setError } = await supabase.from('exercise_sets').insert(setsToInsert)
+          if (setError) throw setError
+        }
       }
       
       setSessionSaved(true)
@@ -206,7 +246,6 @@ export default function Dashboard({ user }) {
         await supabase.from('workout_sessions').delete().eq('id', sessionId)
         setSessionSaved(false)
         setSessionId(null)
-        // Reset local state
         const allList = [...(currentPlan.warmup || []), ...(currentPlan.exercises || [])]
         setExercises(allList.map(ex => ({
           ...ex,
@@ -264,7 +303,7 @@ export default function Dashboard({ user }) {
           ) : (
             <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
               {exercises.map((ex, exIdx) => (
-                <div key={exIdx} style={{ background: ex.isWarmup ? 'rgba(255, 107, 0, 0.05)' : 'var(--bg-input)', padding: '15px', borderRadius: '8px', borderLeft: ex.isWarmup ? '4px solid #FF6B00' : 'none' }}>
+                <div key={exIdx} style={{ background: ex.isWarmup ? 'rgba(255, 107, 0, 0.05)' : 'rgba(30, 30, 30, 0.75)', padding: '15px', borderRadius: '8px', borderLeft: ex.isWarmup ? '4px solid #FF6B00' : 'none' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                     <div>
                       <strong style={{ fontSize: '16px' }}>{ex.name}</strong>
@@ -285,13 +324,14 @@ export default function Dashboard({ user }) {
                     <div key={setIdx} style={{ display: 'grid', gridTemplateColumns: '40px 1fr 1fr 40px 30px', gap: '10px', alignItems: 'center', marginBottom: '5px' }}>
                       <div style={{ fontWeight: 'bold' }}>{setIdx + 1}</div>
                       <input 
-                        type="text" 
+                        type="number" 
                         value={set.reps} 
                         onChange={(e) => handleSetChange(exIdx, setIdx, 'reps', e.target.value)}
                         placeholder="Reps"
                       />
                       <input 
                         type="number" 
+                        step="0.5"
                         value={set.weight} 
                         onChange={(e) => handleSetChange(exIdx, setIdx, 'weight', e.target.value)}
                         placeholder={ex.isWarmup ? "-" : "kg"}
@@ -344,25 +384,25 @@ export default function Dashboard({ user }) {
               <Utensils color="#FF6B00" /> Diet Plan
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div style={{ background: 'var(--bg-input)', padding: '15px', borderRadius: '4px' }}>
+              <div style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px' }}>
                 <strong style={{ color: 'var(--accent-orange)' }}>PRE-WORKOUT</strong>
                 <p>{currentPlan.diet.pre}</p>
               </div>
               {currentPlan.diet.post && (
-                <div style={{ background: 'var(--bg-input)', padding: '15px', borderRadius: '4px' }}>
+                <div style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px' }}>
                   <strong style={{ color: 'var(--accent-orange)' }}>POST-WORKOUT</strong>
                   <p>{currentPlan.diet.post}</p>
                 </div>
               )}
-              <div style={{ background: 'var(--bg-input)', padding: '15px', borderRadius: '4px' }}>
+              <div style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px' }}>
                 <strong style={{ color: 'var(--accent-orange)' }}>LUNCH</strong>
                 <p>{currentPlan.diet.lunch}</p>
               </div>
-              <div style={{ background: 'var(--bg-input)', padding: '15px', borderRadius: '4px' }}>
+              <div style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px' }}>
                 <strong style={{ color: 'var(--accent-orange)' }}>SNACK</strong>
                 <p>{currentPlan.diet.snack}</p>
               </div>
-              <div style={{ background: 'var(--bg-input)', padding: '15px', borderRadius: '4px' }}>
+              <div style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px' }}>
                 <strong style={{ color: 'var(--accent-orange)' }}>DINNER</strong>
                 <p>{currentPlan.diet.dinner}</p>
               </div>

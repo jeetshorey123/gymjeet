@@ -25,17 +25,27 @@ CREATE TABLE IF NOT EXISTS workout_sessions (
   UNIQUE(user_id, date)
 );
 
--- Drop the old exercise_logs table if it exists as the schema is changing
+-- Drop tables if they exist for clean relational schema
+DROP TABLE IF EXISTS exercise_sets;
 DROP TABLE IF EXISTS exercise_logs;
 
--- Exercise Logs (Now supports JSONB sets and warmup flag)
+-- Exercise Logs (Master record for an exercise performed in a session)
 CREATE TABLE exercise_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id UUID REFERENCES workout_sessions(id) ON DELETE CASCADE,
   exercise_name TEXT NOT NULL,
   target_muscle TEXT,
   is_warmup BOOLEAN DEFAULT false,
-  sets_data JSONB NOT NULL, -- Format: [{ reps: 10, weight: 50, completed: true }]
+  completed BOOLEAN DEFAULT false
+);
+
+-- Exercise Sets (Child records for individual sets, reps, and weights)
+CREATE TABLE exercise_sets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  log_id UUID REFERENCES exercise_logs(id) ON DELETE CASCADE,
+  set_number INTEGER NOT NULL,
+  reps INTEGER,
+  weight_kg NUMERIC,
   completed BOOLEAN DEFAULT false
 );
 
