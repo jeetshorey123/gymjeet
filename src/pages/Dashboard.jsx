@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { blueprint } from '../data/blueprint'
-import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus } from 'lucide-react'
+import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus, Activity } from 'lucide-react'
 
 export default function Dashboard({ user }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -10,6 +10,7 @@ export default function Dashboard({ user }) {
   const [exercises, setExercises] = useState([])
   const [sessionSaved, setSessionSaved] = useState(false)
   const [sessionId, setSessionId] = useState(null)
+  const [recentWorkouts, setRecentWorkouts] = useState([])
 
   const currentPlan = blueprint.days.find(d => d.id === selectedDay)
 
@@ -57,6 +58,15 @@ export default function Dashboard({ user }) {
           .eq('user_id', user.id)
           .eq('date', date)
           .single()
+
+        const { data: recentData } = await supabase
+          .from('workout_sessions')
+          .select('date, day_plan, completed')
+          .eq('user_id', user.id)
+          .order('date', { ascending: false })
+          .limit(10)
+        
+        if (recentData) setRecentWorkouts(recentData)
         
         if (sessionData) {
           setSessionSaved(true)
@@ -407,6 +417,27 @@ export default function Dashboard({ user }) {
                 <p>{currentPlan.diet.dinner}</p>
               </div>
             </div>
+          </div>
+          
+          <div className="card" style={{ marginTop: '20px' }}>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+              <Activity color="#FF6B00" /> Recent Workouts (Last 10 Days)
+            </h2>
+            {recentWorkouts.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)' }}>No recent workouts found.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {recentWorkouts.map((session, idx) => (
+                  <div key={idx} style={{ background: 'rgba(30, 30, 30, 0.5)', padding: '15px', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: session.completed ? '4px solid #4caf50' : '4px solid #d32f2f' }}>
+                    <div>
+                      <strong style={{ color: 'white' }}>{session.date}</strong>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '5px' }}>{session.day_plan}</div>
+                    </div>
+                    {session.completed ? <CheckCircle size={20} color="#4caf50" /> : <span style={{fontSize: '12px', color: '#d32f2f'}}>Incomplete</span>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabaseClient'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import Model from 'react-body-highlighter'
-import { Activity, Flame, TrendingDown, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { Activity, Flame, TrendingDown, ChevronLeft, ChevronRight, Calendar, CheckCircle } from 'lucide-react'
 
 // Helper to format date strings for different intervals
 const formatInterval = (dateStr, interval) => {
@@ -304,9 +304,21 @@ export default function Progress({ user }) {
       <div className="grid-2">
         {/* Drill-down View */}
         <div className="card" id="day-breakdown-section">
-          <h3 style={{ marginBottom: '20px' }}>Day Breakdown</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ margin: 0 }}>Day Breakdown</h3>
+            <select 
+              value={selectedSessionId || ''} 
+              onChange={(e) => setSelectedSessionId(e.target.value)}
+              style={{ padding: '5px 10px', background: 'var(--bg-input)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px', fontSize: '12px' }}
+            >
+              <option value="">Select a date...</option>
+              {validSessions.map(s => (
+                <option key={s.id} value={s.id}>{s.date} - {s.day_plan}</option>
+              ))}
+            </select>
+          </div>
           {!selectedSessionData ? (
-            <p style={{ color: 'var(--text-muted)' }}>Select a session from the table to view its detailed sets and reps.</p>
+            <p style={{ color: 'var(--text-muted)' }}>Select a session from the dropdown or table above to view its detailed sets and reps.</p>
           ) : (
             <div>
               <h4 style={{ color: 'var(--accent-orange)', marginBottom: '15px' }}>{selectedSessionData.date} - {selectedSessionData.day_plan}</h4>
