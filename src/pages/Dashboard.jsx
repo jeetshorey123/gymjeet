@@ -81,7 +81,7 @@ export default function Dashboard({ user }) {
               if (log && setsData) {
                 const mySets = setsData.filter(s => s.log_id === log.id).map(s => ({
                   reps: s.reps || '',
-                  weight: s.weight_kg || '',
+                  weight: (s.weight_kg !== null && s.weight_kg !== undefined) ? s.weight_kg : (ex.isWarmup ? '' : 10),
                   completed: s.completed
                 }))
                 return {
@@ -127,7 +127,7 @@ export default function Dashboard({ user }) {
     const lastSet = currentSets[currentSets.length - 1];
     currentSets.push({
       reps: lastSet ? lastSet.reps : '',
-      weight: lastSet ? lastSet.weight : '',
+      weight: lastSet && lastSet.weight ? lastSet.weight : (newEx[exIndex].isWarmup ? '' : 10),
       completed: false
     })
     setExercises(newEx)

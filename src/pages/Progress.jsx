@@ -263,7 +263,12 @@ export default function Progress({ user }) {
                         <td style={{ padding: '10px' }}>{exDone} / {ex.length}</td>
                         <td style={{ padding: '10px' }}>{session.completed ? <span style={{ color: '#4caf50' }}>✓ Yes</span> : <span style={{ color: '#d32f2f' }}>✗ No</span>}</td>
                         <td style={{ padding: '10px' }}>
-                          <button onClick={() => setSelectedSessionId(session.id)} style={{ padding: '5px 10px', fontSize: '12px' }}>View Sets</button>
+                          <button onClick={() => {
+                            setSelectedSessionId(session.id);
+                            setTimeout(() => {
+                              document.getElementById('day-breakdown-section')?.scrollIntoView({ behavior: 'smooth' });
+                            }, 100);
+                          }} style={{ padding: '5px 10px', fontSize: '12px' }}>View Sets</button>
                         </td>
                       </tr>
                     )
@@ -298,7 +303,7 @@ export default function Progress({ user }) {
 
       <div className="grid-2">
         {/* Drill-down View */}
-        <div className="card">
+        <div className="card" id="day-breakdown-section">
           <h3 style={{ marginBottom: '20px' }}>Day Breakdown</h3>
           {!selectedSessionData ? (
             <p style={{ color: 'var(--text-muted)' }}>Select a session from the table to view its detailed sets and reps.</p>
