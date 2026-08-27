@@ -195,15 +195,48 @@ export default function Dashboard({ user }) {
 
   const calculateCalories = () => {
     let totalCals = 0;
+    const UW = parseFloat(weight) || 85;
+    const MOBILITY_FACTOR = 0.0025;
+    const HEAVY_COMPOUND_BASE = 0.30;
+    const HEAVY_COMPOUND_MULT = 0.005;
+    const ISOLATION_BASE = 0.15;
+    const ISOLATION_MULT = 0.002;
+    const MET_ROWING = 7.0;
+
     exercises.forEach(ex => {
       ex.setsData.forEach(set => {
         if (set.completed) {
+          const R = parseInt(set.reps) || 0;
+          const W = parseFloat(set.weight) || 0;
+          
           if (ex.isWarmup) {
-            totalCals += 10;
+            if (ex.name.includes("Deep Squat Pry")) {
+              totalCals += (R / 60) * 3.5 * (UW / 60);
+            } else if (ex.name.includes("Pogo Jumps")) {
+              totalCals += (R / 60) * 5.0 * (UW / 60);
+            } else if (ex.name.includes("High-Knee Sprints") || ex.name.includes("Mountain Climbers")) {
+              totalCals += (R / 60) * MET_ROWING * (UW / 60);
+            } else {
+              totalCals += R * (UW * MOBILITY_FACTOR);
+            }
           } else {
-            const w = parseFloat(set.weight) || 0;
-            const r = parseInt(set.reps) || 0;
-            totalCals += 5 + (w * r * 0.003); 
+            const isCardio = ex.name.includes("Rowing") || ex.name.includes("Cycling") || ex.name.includes("Stairmaster") || ex.name.includes("Treadmill") || ex.name.includes("Assault Bike");
+            const isHeavyCompound = [
+              "Barbell Back Squats", "Romanian Deadlifts", "Leg Press",
+              "Decline DB Press", "Weighted Dips", "Bent-Over Barbell Rows",
+              "Bent-Over Barbell Rows (Overhand Grip)", "Wide-Grip Pulldowns",
+              "Wide-Grip Lat Pulldowns", "Seated Overhead Press", 
+              "Seated Overhead Dumbbell Press", "Incline Barbell Bench", 
+              "Incline Barbell Bench Press"
+            ].includes(ex.name);
+
+            if (isCardio) {
+              totalCals += R * MET_ROWING * (UW / 60); 
+            } else if (isHeavyCompound) {
+              totalCals += (R * HEAVY_COMPOUND_BASE) + (R * W * HEAVY_COMPOUND_MULT) + (UW * 0.03);
+            } else {
+              totalCals += (R * ISOLATION_BASE) + (R * W * ISOLATION_MULT) + (UW * 0.015);
+            }
           }
         }
       })
