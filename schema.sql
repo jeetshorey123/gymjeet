@@ -49,6 +49,11 @@ CREATE TABLE exercise_sets (
   completed BOOLEAN DEFAULT false
 );
 
--- Insert initial users
-INSERT INTO users (username, password) VALUES ('jeet', 'jeet') ON CONFLICT (username) DO NOTHING;
+-- Insert users
+INSERT INTO users (username, password) VALUES ('jeet', 'j') ON CONFLICT (username) DO NOTHING;
 INSERT INTO users (username, password) VALUES ('guest', 'guest') ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, password) VALUES ('vighnesh', 'vighnesh') ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, password) VALUES ('aditi', 'aditi') ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, password) VALUES ('aryan', 'aryan') ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, password) VALUES ('ankur', 'ankur') ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, password) VALUES ('viraj', 'viraj') ON CONFLICT (username) DO NOTHING;

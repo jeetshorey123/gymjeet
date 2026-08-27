@@ -14,9 +14,9 @@ export default function Login({ onLogin }) {
     const userLower = username.toLowerCase()
     const passLower = password.toLowerCase()
 
-    // As requested, simple auth checking 'jeet' or 'guest'
-    if ((userLower === 'jeet' && passLower === 'jeet') || 
-        (userLower === 'guest' && passLower === 'guest')) {
+    const validUsers = ['guest', 'vighnesh', 'aditi', 'aryan', 'ankur', 'viraj']
+    // As requested, simple auth checking
+    if ((userLower === 'jeet' && passLower === 'j') || (userLower === passLower && validUsers.includes(userLower))) {
       
       // Let's also check if user exists in our supabase users table (since we seeded it)
       // If we don't have supabase connected yet, fallback to direct login for dev
@@ -39,7 +39,7 @@ export default function Login({ onLogin }) {
         onLogin({ id: 'local-id', username })
       }
     } else {
-      setError('Invalid credentials. Use jeet/jeet or guest/guest.')
+      setError('Invalid credentials. Use a valid username and matching password.')
     }
   }
 

@@ -353,6 +353,46 @@ export default function Progress({ user }) {
           ) : (
             <div>
               <h4 style={{ color: 'var(--accent-orange)', marginBottom: '15px' }}>{selectedSessionData.date} - {selectedSessionData.day_plan}</h4>
+              
+              {(() => {
+                const improvements = [];
+                selectedSessionLogs.forEach(log => {
+                  if (log.is_warmup || !log.sets_data) return;
+                  const prevSession = sessions.find(s => s.date < selectedSessionData.date && logs.some(l => l.session_id === s.id && l.exercise_name === log.exercise_name && !l.is_warmup));
+                  if (prevSession) {
+                    const prevLog = logs.find(l => l.session_id === prevSession.id && l.exercise_name === log.exercise_name && !l.is_warmup);
+                    if (prevLog && prevLog.sets_data) {
+                      const currMax = Math.max(...log.sets_data.map(s => Number(s.weight_kg) || 0));
+                      const prevMax = Math.max(...prevLog.sets_data.map(s => Number(s.weight_kg) || 0));
+                      const currReps = log.sets_data.reduce((sum, s) => sum + (Number(s.reps) || 0), 0);
+                      const prevReps = prevLog.sets_data.reduce((sum, s) => sum + (Number(s.reps) || 0), 0);
+                      
+                      if (currMax > prevMax && prevMax > 0) {
+                        improvements.push(`🚀 ${log.exercise_name}: +${currMax - prevMax}kg heavier`);
+                      } else if (currMax === prevMax && currReps > prevReps && currMax > 0) {
+                        improvements.push(`🔥 ${log.exercise_name}: +${currReps - prevReps} total reps at ${currMax}kg`);
+                      } else if (currReps > prevReps && currMax === 0 && prevMax === 0) {
+                        improvements.push(`🔥 ${log.exercise_name}: +${currReps - prevReps} total reps`);
+                      }
+                    }
+                  }
+                });
+                
+                if (improvements.length > 0) {
+                  return (
+                    <div style={{ background: 'rgba(76, 175, 80, 0.1)', border: '1px solid #4caf50', borderRadius: '4px', padding: '10px', marginBottom: '15px' }}>
+                      <h5 style={{ color: '#4caf50', margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        Improvements vs Last Session
+                      </h5>
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: '#fff' }}>
+                        {improvements.map((imp, i) => <li key={i} style={{ marginBottom: '4px' }}>{imp}</li>)}
+                      </ul>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
               <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
                 {selectedSessionLogs.map((log, idx) => {
                   let prevSets = [];
