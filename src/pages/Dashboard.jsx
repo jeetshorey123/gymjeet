@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { blueprint } from '../data/blueprint'
-import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus, Activity, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus, Activity, ChevronLeft, ChevronRight, Info, X } from 'lucide-react'
+import Model from 'react-body-highlighter'
 
 export default function Dashboard({ user }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -13,6 +14,7 @@ export default function Dashboard({ user }) {
   const [recentWorkouts, setRecentWorkouts] = useState([])
   const [recentPage, setRecentPage] = useState(0)
   const [totalRecent, setTotalRecent] = useState(0)
+  const [infoModal, setInfoModal] = useState(null)
 
   const currentPlan = blueprint.days.find(d => d.id === selectedDay)
 
@@ -357,8 +359,17 @@ export default function Dashboard({ user }) {
                 <div key={exIdx} style={{ background: ex.isWarmup ? 'rgba(255, 107, 0, 0.05)' : 'rgba(30, 30, 30, 0.75)', padding: '15px', borderRadius: '8px', borderLeft: ex.isWarmup ? '4px solid #FF6B00' : 'none' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                     <div>
-                      <strong style={{ fontSize: '16px' }}>{ex.name}</strong>
-                      {ex.isWarmup && <span style={{ marginLeft: '10px', fontSize: '11px', background: '#FF6B00', padding: '2px 6px', borderRadius: '4px' }}>WARM-UP</span>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <strong style={{ fontSize: '16px' }}>{ex.name}</strong>
+                        <button 
+                          onClick={() => setInfoModal({ ...ex, day: selectedDay })}
+                          style={{ background: 'rgba(255, 107, 0, 0.1)', border: 'none', color: '#FF6B00', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', borderRadius: '50%' }}
+                          title="View Details"
+                        >
+                          <Info size={16} />
+                        </button>
+                        {ex.isWarmup && <span style={{ marginLeft: '10px', fontSize: '11px', background: '#FF6B00', padding: '2px 6px', borderRadius: '4px' }}>WARM-UP</span>}
+                      </div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{ex.muscle}</div>
                     </div>
                   </div>
@@ -515,6 +526,61 @@ export default function Dashboard({ user }) {
           </div>
         </div>
       </div>
+      
+      {infoModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+          background: 'rgba(0,0,0,0.8)', zIndex: 9999, 
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+        }}>
+          <div className="card" style={{ maxWidth: '700px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
+            <button 
+              onClick={() => setInfoModal(null)}
+              style={{ position: 'absolute', right: '15px', top: '15px', background: 'transparent', border: 'none', color: 'white' }}
+            >
+              <X size={24} />
+            </button>
+            <h2 style={{ color: 'var(--accent-orange)', marginBottom: '15px', paddingRight: '30px' }}>{infoModal.name}</h2>
+            
+            <img 
+              src={`/images/${infoModal.day}_${infoModal.name.split(' (')[0].replace(/\//g, '-')}.jpg`} 
+              alt={infoModal.name}
+              onError={(e) => { e.target.style.display = 'none'; }}
+              style={{ width: '100%', borderRadius: '8px', marginBottom: '20px', display: 'block' }}
+            />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px', marginBottom: '15px' }}>
+              <div>
+                {infoModal.steps && (
+                  <div style={{ marginBottom: '15px' }}>
+                    <strong style={{ color: 'var(--accent-orange)' }}>Steps:</strong>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '5px' }}>{infoModal.steps}</p>
+                  </div>
+                )}
+                
+                {infoModal.mistake && (
+                  <div>
+                    <strong style={{ color: '#d32f2f' }}>Mistake to Avoid:</strong>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '5px' }}>{infoModal.mistake}</p>
+                  </div>
+                )}
+                
+                {!infoModal.steps && !infoModal.mistake && (
+                  <p style={{ color: 'var(--text-muted)' }}>Detailed guide coming soon.</p>
+                )}
+              </div>
+              
+              <div style={{ background: '#111', padding: '10px', borderRadius: '8px', display: 'flex', justifyContent: 'center' }}>
+                <Model 
+                  data={[{ name: infoModal.name, muscles: infoModal.targetMuscles || [] }]}
+                  style={{ width: '12rem', padding: '1rem' }}
+                  highlightedColors={['#FF6B00']}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
