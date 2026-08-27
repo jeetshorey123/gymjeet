@@ -207,6 +207,9 @@ export default function Dashboard({ user }) {
     const MET_HIIT_SPRINT = 12.0;
     const MET_PLANK = 4.0;
     const MET_STAIRMASTER = 8.0;
+    const MET_JUMP_ROPE = 10.0;
+    const MET_FARMERS_CARRY = 8.5;
+    const MET_BATTLE_ROPES = 10.0;
 
     let cals = 0;
     if (isWarmup) {
@@ -218,6 +221,8 @@ export default function Dashboard({ user }) {
         cals = (R / 60) * MET_HIGH_KNEES * (UW / 60);
       } else if (exName.includes("Hollow Body Rocks")) {
         cals = (R / 60) * MET_HOLLOW_ROCK * (UW / 60);
+      } else if (exName.includes("Fast Skipping Rope") || exName.includes("Jumping Jacks")) {
+        cals = (R / 60) * MET_JUMP_ROPE * (UW / 60);
       } else {
         const repsMultiplier = exName.includes("(per pos)") ? 3 : 1;
         cals = (R * repsMultiplier) * (UW * MOBILITY_FACTOR);
@@ -229,16 +234,21 @@ export default function Dashboard({ user }) {
         "Bent-Over Barbell Rows (Overhand Grip)", "Wide-Grip Pulldowns",
         "Wide-Grip Lat Pulldowns", "Seated Overhead Press", 
         "Seated Overhead Dumbbell Press", "Incline Barbell Bench", 
-        "Incline Barbell Bench Press", "Seated Cable Rows (Wide Grip)"
+        "Incline Barbell Bench Press", "Seated Cable Rows (Wide Grip)",
+        "Wide Pull-Ups/Pulldown", "Single-Arm DB Rows", "Dumbbell Thrusters"
       ].includes(exName);
 
       if (exName.includes("Treadmill HIIT") || exName.includes("Assault Bike or Treadmill HIIT")) {
         cals = R * MET_HIIT_SPRINT * (UW / 60);
       } else if (exName.includes("Stairmaster") || exName.includes("High-Incline Walk")) {
         cals = R * MET_STAIRMASTER * (UW / 60);
+      } else if (exName.includes("Battle Ropes")) {
+        cals = R * MET_BATTLE_ROPES * (UW / 60);
       } else if (exName.includes("Rowing") || exName.includes("Cycling") || exName.includes("Assault Bike")) {
         cals = R * MET_ROWING * (UW / 60);
-      } else if (exName.includes("Weighted Plank") || exName.includes("Plank")) {
+      } else if (exName.includes("Farmer's Carries")) {
+        cals = (R / 60) * MET_FARMERS_CARRY * (UW / 60);
+      } else if (exName.includes("Weighted Plank") || exName.includes("Side Plank") || exName.includes("Plank")) {
         cals = (R / 60) * MET_PLANK * (UW / 60);
       } else if (isHeavyCompound) {
         cals = (R * HEAVY_COMPOUND_BASE) + (R * W * HEAVY_COMPOUND_MULT) + (UW * 0.03);

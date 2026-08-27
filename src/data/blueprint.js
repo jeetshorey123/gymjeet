@@ -51,29 +51,29 @@ const warmupDay4 = [
 ];
 
 const warmupDay5 = [
-  { name: "Arm Circles (forward & backward)", sets: 1, reps: "20 per dir", muscle: "Shoulders", isWarmup: true },
-  { name: "Straight-Arm Band Pulldowns", sets: 1, reps: 15, muscle: "Lats", isWarmup: true },
-  { name: "Cat-Cow to Thoracic Extension", sets: 1, reps: 12, muscle: "Spine", isWarmup: true },
-  { name: "Prone Y-T-W Raises (per pos)", sets: 1, reps: 10, muscle: "Shoulders", isWarmup: true },
-  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
-  { name: "Thread the Needle (per side)", sets: 1, reps: 8, muscle: "Upper Back", isWarmup: true },
-  { name: "Bird-Dog with 2-Second Squeeze (per side)", sets: 1, reps: 10, muscle: "Core", isWarmup: true },
-  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
-  { name: "Side Plank with Arm Sweep (per side)", sets: 1, reps: 10, muscle: "Obliques", isWarmup: true },
-  { name: "Fast Skipping Rope / Jumping Jacks (sec)", sets: 1, reps: 45, muscle: "Cardio", isWarmup: true }
+  { name: "Arm Circles (forward & backward)", sets: 1, reps: "20 per dir", muscle: "Shoulders", isWarmup: true, steps: "Stand tall. Extend arms straight out to the sides. Make 20 tight, controlled circles forward, then 20 backward.", mistake: "Shrugging your shoulders up to your ears. Keep your shoulder blades pulled down." },
+  { name: "Straight-Arm Band Pulldowns", sets: 1, reps: 15, muscle: "Lats", isWarmup: true, steps: "Anchor a resistance band at head height. Keep your arms locked straight and push the band down in an arc to your thighs, squeezing your lats (armpits).", mistake: "Bending your elbows and turning it into a tricep extension." },
+  { name: "Cat-Cow to Thoracic Extension", sets: 1, reps: 12, muscle: "Spine", isWarmup: true, steps: "Get on all fours. Inhale, drop your belly to the floor (Cow). Exhale, push the floor away, and round your upper back to the ceiling (Cat).", mistake: "Rushing the movement. Tie it to your breathing." },
+  { name: "Prone Y-T-W Raises (per pos)", sets: 1, reps: 10, muscle: "Shoulders", isWarmup: true, steps: "Lie face down. Lift your arms into a \"Y\", lower. Lift into a \"T\", lower. Bend elbows and lift into a \"W\", lower.", mistake: "Arching your lower back to lift your chest off the floor. Keep your forehead down." },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true, steps: "Deep lunge forward. Put both hands inside your front foot. Drop the inside elbow toward the floor, then reach that hand to the ceiling, twisting your torso.", mistake: "Letting the back knee rest dead on the floor." },
+  { name: "Thread the Needle (per side)", sets: 1, reps: 8, muscle: "Upper Back", isWarmup: true, steps: "On all fours, slide your right arm under your body until your shoulder touches the floor. Then pull it out and reach to the ceiling. Switch sides.", mistake: "Keeping your hips rigidly locked. Let the torso rotate naturally." },
+  { name: "Bird-Dog with 2-Second Squeeze (per side)", sets: 1, reps: 10, muscle: "Core", isWarmup: true, steps: "On all fours, reach your right arm straight forward and left leg straight back. Hold for 2 seconds, bracing your core.", mistake: "Reaching so high that your lower back heavily arches. Reach for length, not height." },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true, steps: "Lie on back, arms up, knees bent at 90 degrees. Lower right arm and left leg to the floor simultaneously. Return and switch.", mistake: "Letting your lower back lift off the floor at any point." },
+  { name: "Side Plank with Arm Sweep (per side)", sets: 1, reps: 10, muscle: "Obliques", isWarmup: true, steps: "Hold a side plank on your forearm. Take your top arm, reach it underneath your body (twisting your torso), then sweep it back up to the ceiling.", mistake: "Letting your hips sag toward the floor as you twist." },
+  { name: "Fast Skipping Rope / Jumping Jacks (sec)", sets: 1, reps: 45, muscle: "Cardio", isWarmup: true, steps: "Stay on the balls of your feet. Keep a rapid, high-intensity pace for 45 seconds to spike the heart rate.", mistake: "Jumping too high off the ground (wastes energy). Just clear the rope." }
 ];
 
 const warmupDay6 = [
-  { name: "Overhead Band Dislocates", sets: 1, reps: 15, muscle: "Shoulders", isWarmup: true },
-  { name: "Wall Slides (Chin tucked back)", sets: 1, reps: 12, muscle: "Shoulders", isWarmup: true },
-  { name: "Cat-Cow Mobility Flow", sets: 1, reps: 10, muscle: "Spine", isWarmup: true },
-  { name: "Scapular Push-ups", sets: 1, reps: 15, muscle: "Upper Back", isWarmup: true },
-  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
-  { name: "Spiderman Lunges with Hip Dip (per side)", sets: 1, reps: 8, muscle: "Hips", isWarmup: true },
-  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
-  { name: "Neck Retractions (Chin Tucks)", sets: 1, reps: 15, muscle: "Neck", isWarmup: true },
-  { name: "Lateral Skater Hops (total reps)", sets: 1, reps: 16, muscle: "Legs", isWarmup: true },
-  { name: "Tuck Jumps", sets: 1, reps: 8, muscle: "Legs", isWarmup: true }
+  { name: "Overhead Band Dislocates", sets: 1, reps: 15, muscle: "Shoulders", isWarmup: true, steps: "Hold a band/towel with a wide grip. Keep arms locked straight. Bring it overhead and down to your lower back, then reverse.", mistake: "Bending your elbows. If you have to bend them, widen your grip." },
+  { name: "Wall Slides (Chin tucked back)", sets: 1, reps: 12, muscle: "Shoulders", isWarmup: true, steps: "Stand against a wall (lower back, elbows, wrists touching). Tuck your chin back. Slide arms up overhead.", mistake: "Letting your lower back arch away from the wall to reach higher." },
+  { name: "Cat-Cow Mobility Flow", sets: 1, reps: 10, muscle: "Spine", isWarmup: true, steps: "On all fours, inhale to drop the belly (Cow), exhale to round the spine (Cat).", mistake: "Forcing the neck into uncomfortable extremes." },
+  { name: "Scapular Push-ups", sets: 1, reps: 15, muscle: "Upper Back", isWarmup: true, steps: "High plank position, arms locked. Pinch shoulder blades together so chest drops, then push the floor away to spread them.", mistake: "Bending the elbows." },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true, steps: "Deep lunge, hands inside front foot. Drop inside elbow, then twist and reach to the ceiling.", mistake: "Resting the back knee on the floor." },
+  { name: "Spiderman Lunges with Hip Dip (per side)", sets: 1, reps: 8, muscle: "Hips", isWarmup: true, steps: "From a plank, step one foot outside your hand. Sink your hips deep into the floor to open the groin. Alternate legs.", mistake: "Letting the front knee collapse inward." },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true, steps: "Lie on back, arms up, knees at 90. Lower opposite arm and leg simultaneously.", mistake: "Lower back arching off the floor." },
+  { name: "Neck Retractions (Chin Tucks)", sets: 1, reps: 15, muscle: "Neck", isWarmup: true, steps: "Stand with your back and head against a wall. Give yourself a \"double chin\" by pulling your head straight back into the wall.", mistake: "Tilting your head up to look at the ceiling. The head must move straight back on a horizontal plane." },
+  { name: "Lateral Skater Hops (total reps)", sets: 1, reps: 16, muscle: "Legs", isWarmup: true, steps: "Leap sideways off your left foot, landing softly on your right foot (letting the left foot sweep behind you). Bound back and forth.", mistake: "Landing with a stiff, locked knee. Absorb the impact." },
+  { name: "Tuck Jumps", sets: 1, reps: 8, muscle: "Legs", isWarmup: true, steps: "Jump as high as possible and aggressively pull both knees up toward your chest in mid-air. Land softly.", mistake: "Just kicking your heels backward. The knees must come forward and up." }
 ];
 
 export const blueprint = {
@@ -184,16 +184,16 @@ export const blueprint = {
       type: "Posture/Back",
       warmup: warmupDay5,
       exercises: [
-        { name: "Wide Pull-Ups/Pulldown", sets: 4, reps: 10, muscle: "V-Taper" },
-        { name: "Single-Arm DB Rows", sets: 4, reps: 12, muscle: "Mid/Low Lat" },
-        { name: "Straight-Arm Pushdowns", sets: 3, reps: 15, muscle: "Armpit/Lat" },
-        { name: "Tricep Rope Pushdowns", sets: 4, reps: 15, muscle: "Triceps" },
-        { name: "Overhead Tricep Ext.", sets: 3, reps: 12, muscle: "Triceps" },
-        { name: "EZ-Bar Preacher Curls", sets: 3, reps: 12, muscle: "Biceps" },
-        { name: "Dumbbell Hammer Curls", sets: 3, reps: 12, muscle: "Forearms" },
-        { name: "Low-to-High Woodchops (per side)", sets: 3, reps: 15, muscle: "Core Twist" },
-        { name: "Weighted Russian Twist", sets: 4, reps: 20, muscle: "Handles" },
-        { name: "Weighted Side Plank (sec/side)", sets: 3, reps: 45, muscle: "Obliques" }
+        { name: "Wide Pull-Ups/Pulldown", sets: 4, reps: 10, muscle: "V-Taper", steps: "Grab the bar wider than shoulder-width. Drive your elbows straight down into your back pockets. Lift your chest to the bar.", mistake: "Pulling the bar behind your neck, or pulling with your biceps instead of your back." },
+        { name: "Single-Arm DB Rows", sets: 4, reps: 12, muscle: "Mid/Low Lat", steps: "Brace one knee and hand on a bench. Hold a dumbbell in the other hand. Pull the dumbbell back toward your hip/pocket, squeezing the lat.", mistake: "Pulling the dumbbell straight up to your chest (this hits the traps and ignores the lats)." },
+        { name: "Straight-Arm Pushdowns", sets: 3, reps: 15, muscle: "Armpit/Lat", steps: "Stand at a cable station with a straight bar attached high. Hinge slightly forward. Keep arms locked and push the bar down to your thighs.", mistake: "Bending the elbows at the top of the movement or rounding your shoulders forward at the bottom." },
+        { name: "Tricep Rope Pushdowns", sets: 4, reps: 15, muscle: "Triceps", steps: "Use a rope attachment. Keep elbows pinned to your ribs. Push the rope down and actively pull the handles apart at the very bottom.", mistake: "Letting your elbows drift forward away from your ribs on the way up." },
+        { name: "Overhead Tricep Ext.", sets: 3, reps: 12, muscle: "Triceps", steps: "Sit on a bench. Hold a dumbbell with both hands over your head. Lower it behind your head until you feel a deep stretch, then press it back up.", mistake: "Flaring your elbows extremely wide to the sides. Keep them pointed relatively upward." },
+        { name: "EZ-Bar Preacher Curls", sets: 3, reps: 12, muscle: "Biceps", steps: "Sit at a preacher bench. Grab the inside curve of the EZ-bar. Lower the weight under control until your arms are nearly straight, then curl up.", mistake: "Leaning backward aggressively to use body weight to pull the bar up." },
+        { name: "Dumbbell Hammer Curls", sets: 3, reps: 12, muscle: "Forearms", steps: "Stand holding dumbbells. Keep your palms facing your thighs (neutral grip). Curl them up toward your shoulders, squeezing the forearms and biceps.", mistake: "Swinging the weights up using momentum from your hips or shoulders." },
+        { name: "Low-to-High Woodchops (per side)", sets: 3, reps: 15, muscle: "Core Twist", steps: "Set pulley to the lowest setting. Grab handle, pivot your back foot, and forcefully chop diagonally upward across your body.", mistake: "Planting your feet flat and twisting only your spine. The rotation must come from pivoting the hips." },
+        { name: "Weighted Russian Twist", sets: 4, reps: 20, muscle: "Handles", steps: "Sit on the floor, lean back slightly, feet hovering. Hold a weight. Twist your shoulders and tap the weight on the floor beside your hip.", mistake: "Just moving your arms side to side while your chest faces forward. You must rotate the shoulders." },
+        { name: "Weighted Side Plank (sec/side)", sets: 3, reps: 45, muscle: "Obliques", steps: "Hold a forearm side plank. Place a dumbbell or weight plate on your top hip. Keep your body in a perfectly straight line.", mistake: "Letting your hips drop toward the floor. Fight the weight to stay elevated." }
       ],
       diet: {
         pre: "1 Black Coffee + 1 Apple + 5g Creatine",
@@ -209,16 +209,16 @@ export const blueprint = {
       type: "Full-Body Athletic",
       warmup: warmupDay6,
       exercises: [
-        { name: "Dumbbell Thrusters", sets: 4, reps: 12, muscle: "Full Body" },
-        { name: "Kettlebell Swings", sets: 4, reps: 15, muscle: "Post. Chain" },
-        { name: "Dumbbell Walking Lunge (per leg)", sets: 3, reps: 12, muscle: "Legs" },
-        { name: "Dumbbell Renegade Rows (per side)", sets: 3, reps: 8, muscle: "Core/Back" },
-        { name: "Heavy Farmer's Carries (meters)", sets: 3, reps: 40, muscle: "Traps/Core" },
-        { name: "Heavy Cable Face Pulls", sets: 4, reps: 15, muscle: "Posture" },
-        { name: "Prone Y-T-W Raises (per pos)", sets: 3, reps: 10, muscle: "Scapula" },
-        { name: "Captain's Chair Tucks", sets: 3, reps: 15, muscle: "Lower Abs" },
-        { name: "Ab Wheel Rollouts", sets: 3, reps: 12, muscle: "Total Core" },
-        { name: "Battle Ropes / Row (intervals)", sets: 1, reps: 10, muscle: "Cardio" }
+        { name: "Dumbbell Thrusters", sets: 4, reps: 12, muscle: "Full Body", steps: "Hold dumbbells at your shoulders. Drop into a full squat. As you stand up aggressively, use the leg momentum to press the dumbbells straight overhead.", mistake: "Pressing the dumbbells early while you are still at the bottom of the squat." },
+        { name: "Kettlebell Swings", sets: 4, reps: 15, muscle: "Post. Chain", steps: "Hinge at the hips, letting the bell swing between your legs. Violently snap your hips forward to propel the bell up to chest height.", mistake: "Squatting down and using your shoulders to perform a front raise. This is a glute/hamstring hip-hinge." },
+        { name: "Dumbbell Walking Lunge (per leg)", sets: 3, reps: 12, muscle: "Legs", steps: "Hold heavy dumbbells. Take a long step forward, drop the back knee to hover just above the floor, and step through to the next rep.", mistake: "Stepping like you are on a tightrope (which ruins balance). Keep feet hip-width apart." },
+        { name: "Dumbbell Renegade Rows (per side)", sets: 3, reps: 8, muscle: "Core/Back", steps: "Hold a push-up position with hands on dumbbells. Brace your core wide. Row one dumbbell up to your ribs, lower it, and switch.", mistake: "Twisting your hips open to the side to help lift the weight. Your hips must stay perfectly parallel to the floor." },
+        { name: "Heavy Farmer's Carries (meters)", sets: 3, reps: 40, muscle: "Traps/Core", steps: "Hold the heaviest dumbbells you can grip. Pull your shoulders back and down. Walk with short, quick, stable steps.", mistake: "Slouching forward as your grip tires. Keep your chest proud." },
+        { name: "Heavy Cable Face Pulls", sets: 4, reps: 15, muscle: "Posture", steps: "Pull the cable rope toward your eyes. Pull your hands apart at the end to squeeze the rear delts. Pause for 1 second.", mistake: "Dropping your elbows below your wrists. Keep elbows high." },
+        { name: "Prone Y-T-W Raises (per pos)", sets: 3, reps: 10, muscle: "Scapula", steps: "Lie face down on an incline bench holding very light plates. Lift into a Y, a T, and a W shape, squeezing the mid-back.", mistake: "Using momentum or heavy weight. This targets tiny postural muscles." },
+        { name: "Captain's Chair Tucks", sets: 3, reps: 15, muscle: "Lower Abs", steps: "Support yourself on the armrests. Pull your knees to your chest, actively curling your pelvis upward.", mistake: "Swinging the legs loosely without curling the lower back/pelvis." },
+        { name: "Ab Wheel Rollouts", sets: 3, reps: 12, muscle: "Total Core", steps: "Kneel, grab the wheel, tuck your hips under. Roll out until your body is straight. Pull back using your core and lats.", mistake: "Arching your lower back and letting your stomach sag to the floor at maximum extension." },
+        { name: "Battle Ropes / Row (intervals)", sets: 1, reps: 10, muscle: "Cardio", steps: "30 seconds of maximum, violent effort. Followed by 30 seconds of complete rest. Repeat 10 times.", mistake: "Pacing yourself. Treat the 30 seconds like a true sprint to the death to maximize the EPOC afterburn." }
       ],
       diet: {
         pre: "1 Black Coffee + 1 Apple + 5g Creatine",
