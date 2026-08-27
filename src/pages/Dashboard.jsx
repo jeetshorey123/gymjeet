@@ -634,7 +634,7 @@ export default function Dashboard({ user }) {
             <h2 style={{ color: 'var(--accent-orange)', marginBottom: '15px', paddingRight: '30px' }}>{infoModal.name}</h2>
             
             <img 
-              src={`/images/${infoModal.day}_${infoModal.name.split(' (')[0].replace(/\//g, '-')}.jpg`} 
+              src={`/images/${infoModal.day}/${infoModal.day}_${infoModal.name.split(' (')[0].replace(/\//g, '-')}.jpg`} 
               alt={infoModal.name}
               onError={(e) => { e.target.style.display = 'none'; }}
               style={{ width: '100%', borderRadius: '8px', marginBottom: '20px', display: 'block' }}
