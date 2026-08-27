@@ -1,14 +1,79 @@
-const standardWarmup = [
-  { name: "Arm Circles (fwd/bwd)", sets: 1, reps: 20, muscle: "front-deltoids", isWarmup: true },
-  { name: "Band Pull-Aparts", sets: 1, reps: 15, muscle: "back-deltoids", isWarmup: true },
-  { name: "Scap Push-ups", sets: 1, reps: 15, muscle: "upper-back", isWarmup: true },
-  { name: "Cat-Cow", sets: 1, reps: 10, muscle: "lower-back", isWarmup: true },
-  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "quadriceps", isWarmup: true },
-  { name: "Bear Crawl (sec)", sets: 1, reps: 30, muscle: "abs", isWarmup: true },
-  { name: "Inchworms", sets: 1, reps: 6, muscle: "hamstrings", isWarmup: true },
-  { name: "Deadbugs/Planks (per side)", sets: 1, reps: 12, muscle: "abs", isWarmup: true },
-  { name: "Explosive Jump/Push-ups", sets: 1, reps: 5, muscle: "chest", isWarmup: true },
-  { name: "High-Knee Sprints (sec)", sets: 1, reps: 45, muscle: "calves", isWarmup: true }
+const warmupDay1 = [
+  { name: "Arm Circles (Forward & Backward)", sets: 1, reps: "20 per dir", muscle: "Shoulders", isWarmup: true },
+  { name: "Dynamic Chest Hugs & Openers", sets: 1, reps: 15, muscle: "Chest", isWarmup: true },
+  { name: "Cat-Cow to Thoracic Extension", sets: 1, reps: 12, muscle: "Spine", isWarmup: true },
+  { name: "Scapular Push-ups", sets: 1, reps: 15, muscle: "Upper Back", isWarmup: true },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
+  { name: "Plank with T-Spine Rotations (per side)", sets: 1, reps: 8, muscle: "Core", isWarmup: true },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
+  { name: "Hollow Body Rocking", sets: 1, reps: 30, muscle: "Core", isWarmup: true },
+  { name: "Explosive Clapping Push-ups", sets: 1, reps: 8, muscle: "Chest", isWarmup: true },
+  { name: "High-Knee Sprints in Place (sec)", sets: 1, reps: 45, muscle: "Cardio", isWarmup: true }
+];
+
+const warmupDay2 = [
+  { name: "Arm Circles (Small to Large)", sets: 1, reps: 20, muscle: "Shoulders", isWarmup: true },
+  { name: "Band Pull-Aparts", sets: 1, reps: 15, muscle: "Upper Back", isWarmup: true },
+  { name: "Cat-Cow with Deep Upper Back Arch", sets: 1, reps: 12, muscle: "Spine", isWarmup: true },
+  { name: "Prone Y-T-W Raises (per pos)", sets: 1, reps: 10, muscle: "Shoulders", isWarmup: true },
+  { name: "Thread the Needle (per side)", sets: 1, reps: 8, muscle: "Upper Back", isWarmup: true },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
+  { name: "Bird-Dog with 2-Second Squeeze (per side)", sets: 1, reps: 10, muscle: "Core", isWarmup: true },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
+  { name: "Banded Face Pulls to Overhead Press", sets: 1, reps: 12, muscle: "Shoulders", isWarmup: true },
+  { name: "Explosive Jump Squats", sets: 1, reps: 10, muscle: "Legs", isWarmup: true }
+];
+
+const warmupDay3 = [
+  { name: "Forward/Backward Leg Swings (per leg)", sets: 1, reps: 15, muscle: "Hips", isWarmup: true },
+  { name: "Side-to-Side Leg Swings (per leg)", sets: 1, reps: 15, muscle: "Hips", isWarmup: true },
+  { name: "Cat-Cow Mobility Flow", sets: 1, reps: 10, muscle: "Spine", isWarmup: true },
+  { name: "Deep Squat Pry with Elbow Push (rocks)", sets: 1, reps: 12, muscle: "Hips", isWarmup: true },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
+  { name: "Cossack Squats (per side)", sets: 1, reps: 6, muscle: "Legs", isWarmup: true },
+  { name: "Single-Leg Glute Bridges (per leg)", sets: 1, reps: 12, muscle: "Glutes", isWarmup: true },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
+  { name: "Pogo Jumps (Ankle Bounces)", sets: 1, reps: 30, muscle: "Calves", isWarmup: true },
+  { name: "Downward Dog Calf Pumps (per leg)", sets: 1, reps: 10, muscle: "Calves", isWarmup: true }
+];
+
+const warmupDay4 = [
+  { name: "Overhead Band Dislocates", sets: 1, reps: 15, muscle: "Shoulders", isWarmup: true },
+  { name: "Wall Slides with Forearm Lift", sets: 1, reps: 12, muscle: "Shoulders", isWarmup: true },
+  { name: "Cat-Cow Mobility Flow", sets: 1, reps: 10, muscle: "Spine", isWarmup: true },
+  { name: "Scapular Push-ups", sets: 1, reps: 15, muscle: "Upper Back", isWarmup: true },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
+  { name: "Pike Push-up Rocks", sets: 1, reps: 10, muscle: "Shoulders", isWarmup: true },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
+  { name: "Alternating V-Ups (total reps)", sets: 1, reps: 16, muscle: "Core", isWarmup: true },
+  { name: "Plank to Push-up (Commandos)", sets: 1, reps: 12, muscle: "Chest/Core", isWarmup: true },
+  { name: "Mountain Climbers (Sprint Pace) (total reps)", sets: 1, reps: 40, muscle: "Cardio", isWarmup: true }
+];
+
+const warmupDay5 = [
+  { name: "Arm Circles (forward & backward)", sets: 1, reps: "20 per dir", muscle: "Shoulders", isWarmup: true },
+  { name: "Straight-Arm Band Pulldowns", sets: 1, reps: 15, muscle: "Lats", isWarmup: true },
+  { name: "Cat-Cow to Thoracic Extension", sets: 1, reps: 12, muscle: "Spine", isWarmup: true },
+  { name: "Prone Y-T-W Raises (per pos)", sets: 1, reps: 10, muscle: "Shoulders", isWarmup: true },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
+  { name: "Thread the Needle (per side)", sets: 1, reps: 8, muscle: "Upper Back", isWarmup: true },
+  { name: "Bird-Dog with 2-Second Squeeze (per side)", sets: 1, reps: 10, muscle: "Core", isWarmup: true },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
+  { name: "Side Plank with Arm Sweep (per side)", sets: 1, reps: 10, muscle: "Obliques", isWarmup: true },
+  { name: "Fast Skipping Rope / Jumping Jacks (sec)", sets: 1, reps: 45, muscle: "Cardio", isWarmup: true }
+];
+
+const warmupDay6 = [
+  { name: "Overhead Band Dislocates", sets: 1, reps: 15, muscle: "Shoulders", isWarmup: true },
+  { name: "Wall Slides (Chin tucked back)", sets: 1, reps: 12, muscle: "Shoulders", isWarmup: true },
+  { name: "Cat-Cow Mobility Flow", sets: 1, reps: 10, muscle: "Spine", isWarmup: true },
+  { name: "Scapular Push-ups", sets: 1, reps: 15, muscle: "Upper Back", isWarmup: true },
+  { name: "World's Greatest Stretch (per side)", sets: 1, reps: 5, muscle: "Full Body", isWarmup: true },
+  { name: "Spiderman Lunges with Hip Dip (per side)", sets: 1, reps: 8, muscle: "Hips", isWarmup: true },
+  { name: "Deadbugs (per side)", sets: 1, reps: 12, muscle: "Core", isWarmup: true },
+  { name: "Neck Retractions (Chin Tucks)", sets: 1, reps: 15, muscle: "Neck", isWarmup: true },
+  { name: "Lateral Skater Hops (total reps)", sets: 1, reps: 16, muscle: "Legs", isWarmup: true },
+  { name: "Tuck Jumps", sets: 1, reps: 8, muscle: "Legs", isWarmup: true }
 ];
 
 export const blueprint = {
@@ -17,7 +82,7 @@ export const blueprint = {
       id: 1,
       name: "DAY 1: CHEST (LOWER SWEEP), SERRATUS, LOWER ABS & HIIT",
       type: "Metabolic/Chest/Shoulders",
-      warmup: standardWarmup,
+      warmup: warmupDay1,
       exercises: [
         { name: "Decline DB Press", sets: 4, reps: 10, muscle: "Lower Chest" },
         { name: "Weighted Dips", sets: 4, reps: 10, muscle: "Lower Pec" },
@@ -42,7 +107,7 @@ export const blueprint = {
       id: 2,
       name: "DAY 2: BACK (HUMP CORRECTION), BICEPS & DEEP CORE",
       type: "Posture/Back",
-      warmup: standardWarmup,
+      warmup: warmupDay2,
       exercises: [
         { name: "Bent-Over Barbell Rows", sets: 4, reps: 10, muscle: "Mid-Back" },
         { name: "Wide-Grip Pulldowns", sets: 4, reps: 10, muscle: "Back Width" },
@@ -67,7 +132,7 @@ export const blueprint = {
       id: 3,
       name: "DAY 3: LEGS, GLUTES & STEADY-STATE CARDIO",
       type: "Leg Day - Heavy Furnace",
-      warmup: standardWarmup,
+      warmup: warmupDay3,
       exercises: [
         { name: "Barbell Back Squats", sets: 4, reps: 8, muscle: "Leg Mass" },
         { name: "Romanian Deadlifts", sets: 4, reps: 10, muscle: "Hamstrings" },
@@ -92,7 +157,7 @@ export const blueprint = {
       id: 4,
       name: "DAY 4: SHOULDERS, UPPER CHEST, LOWER ABS & HIIT",
       type: "Metabolic/Chest/Shoulders",
-      warmup: standardWarmup,
+      warmup: warmupDay4,
       exercises: [
         { name: "Seated Overhead Press", sets: 4, reps: 10, muscle: "Delts" },
         { name: "Incline Barbell Bench", sets: 4, reps: 10, muscle: "Upper Chest" },
@@ -117,7 +182,7 @@ export const blueprint = {
       id: 5,
       name: "DAY 5: BACK (LATS/WIDTH), ARMS & OBLIQUES",
       type: "Posture/Back",
-      warmup: standardWarmup,
+      warmup: warmupDay5,
       exercises: [
         { name: "Wide Pull-Ups/Pulldown", sets: 4, reps: 10, muscle: "V-Taper" },
         { name: "Single-Arm DB Rows", sets: 4, reps: 12, muscle: "Mid/Low Lat" },
@@ -142,7 +207,7 @@ export const blueprint = {
       id: 6,
       name: "DAY 6: FUNCTIONAL FULL-BODY & POSTURE",
       type: "Full-Body Athletic",
-      warmup: standardWarmup,
+      warmup: warmupDay6,
       exercises: [
         { name: "Dumbbell Thrusters", sets: 4, reps: 12, muscle: "Full Body" },
         { name: "Kettlebell Swings", sets: 4, reps: 15, muscle: "Post. Chain" },
