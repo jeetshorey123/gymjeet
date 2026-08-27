@@ -19,8 +19,7 @@ const formatInterval = (dateStr, interval) => {
 
 export default function Progress({ user }) {
   const [timeFilter, setTimeFilter] = useState('Daily')
-  const [customStart, setCustomStart] = useState('')
-  const [customEnd, setCustomEnd] = useState('')
+  const [customDates, setCustomDates] = useState([])
   
   const [weights, setWeights] = useState([])
   const [sessions, setSessions] = useState([])
@@ -85,13 +84,13 @@ export default function Progress({ user }) {
   // Apply Custom Date filtering
   const validWeights = useMemo(() => {
     if (timeFilter !== 'Custom') return weights;
-    return weights.filter(w => (!customStart || w.date >= customStart) && (!customEnd || w.date <= customEnd));
-  }, [weights, timeFilter, customStart, customEnd])
+    return weights.filter(w => customDates.includes(w.date));
+  }, [weights, timeFilter, customDates])
 
   const validSessions = useMemo(() => {
     if (timeFilter !== 'Custom') return sessions;
-    return sessions.filter(s => (!customStart || s.date >= customStart) && (!customEnd || s.date <= customEnd));
-  }, [sessions, timeFilter, customStart, customEnd])
+    return sessions.filter(s => customDates.includes(s.date));
+  }, [sessions, timeFilter, customDates])
 
   // Aggregate Data based on Time Filter
   const aggregatedWeight = useMemo(() => {
@@ -195,11 +194,27 @@ export default function Progress({ user }) {
           </button>
         ))}
         {timeFilter === 'Custom' && (
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginLeft: 'auto' }}>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>From:</span>
-            <input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} style={{ padding: '5px', fontSize: '12px' }} />
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>To:</span>
-            <input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} style={{ padding: '5px', fontSize: '12px' }} />
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginLeft: 'auto', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Select Dates:</span>
+            {sessions.map(s => s.date).filter((v, i, a) => a.indexOf(v) === i).map(date => (
+              <button 
+                key={date}
+                onClick={() => {
+                  setCustomDates(prev => 
+                    prev.includes(date) ? prev.filter(d => d !== date) : [...prev, date]
+                  )
+                }}
+                style={{
+                  padding: '4px 10px', fontSize: '11px', borderRadius: '12px',
+                  background: customDates.includes(date) ? 'var(--accent-orange)' : 'var(--bg-input)',
+                  color: customDates.includes(date) ? '#000' : '#fff',
+                  border: '1px solid', borderColor: customDates.includes(date) ? 'var(--accent-orange)' : 'var(--border-color)',
+                  cursor: 'pointer'
+                }}
+              >
+                {date}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -339,11 +354,22 @@ export default function Progress({ user }) {
             <div>
               <h4 style={{ color: 'var(--accent-orange)', marginBottom: '15px' }}>{selectedSessionData.date} - {selectedSessionData.day_plan}</h4>
               <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
-                {selectedSessionLogs.map((log, idx) => (
+                {selectedSessionLogs.map((log, idx) => {
+                  let prevSets = [];
+                  const prevSession = sessions.find(s => s.date < selectedSessionData.date && logs.some(l => l.session_id === s.id && l.exercise_name === log.exercise_name && !!l.is_warmup === !!log.is_warmup));
+                  if (prevSession) {
+                    const prevLog = logs.find(l => l.session_id === prevSession.id && l.exercise_name === log.exercise_name && !!l.is_warmup === !!log.is_warmup);
+                    if (prevLog && prevLog.sets_data) prevSets = prevLog.sets_data;
+                  }
+
+                  return (
                   <div key={idx} style={{ background: 'var(--bg-input)', padding: '10px', borderRadius: '4px', marginBottom: '10px', borderLeft: log.is_warmup ? '4px solid #FF6B00' : '4px solid #4caf50' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                       <strong>{log.exercise_name}</strong>
-                      {log.completed ? <CheckCircle size={16} color="#4caf50" /> : <span style={{fontSize: '12px', color: '#d32f2f'}}>Missed</span>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {prevSession && <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>vs {prevSession.date}</span>}
+                        {log.completed ? <CheckCircle size={16} color="#4caf50" /> : <span style={{fontSize: '12px', color: '#d32f2f'}}>Missed</span>}
+                      </div>
                     </div>
                     <table style={{ width: '100%', fontSize: '12px', color: 'var(--text-muted)' }}>
                       <thead>
@@ -352,21 +378,27 @@ export default function Progress({ user }) {
                           <th style={{ textAlign: 'left' }}>Reps</th>
                           <th style={{ textAlign: 'left' }}>Weight (kg)</th>
                           <th style={{ textAlign: 'left' }}>Done</th>
+                          <th style={{ textAlign: 'left', color: 'var(--accent-orange)' }}>Last Time</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {(log.sets_data || []).map((set, sIdx) => (
+                        {(log.sets_data || []).map((set, sIdx) => {
+                          const pSet = prevSets[sIdx];
+                          const pText = pSet ? `${pSet.reps} x ${pSet.weight_kg || 'BW'}` : '-';
+                          return (
                           <tr key={sIdx}>
                             <td>{set.set_number}</td>
                             <td>{set.reps}</td>
                             <td>{set.weight_kg || '-'}</td>
                             <td>{set.completed ? '✓' : '✗'}</td>
+                            <td style={{ color: 'var(--accent-orange)' }}>{pText}</td>
                           </tr>
-                        ))}
+                          )
+                        })}
                       </tbody>
                     </table>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
           )}

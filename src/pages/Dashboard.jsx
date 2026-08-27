@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { blueprint } from '../data/blueprint'
-import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus, Activity, ChevronLeft, ChevronRight, Info, X } from 'lucide-react'
+import { CheckCircle, Save, Calendar, Scale, Utensils, Trash2, Plus, Activity, ChevronLeft, ChevronRight, Info, X, Flame } from 'lucide-react'
 import Model from 'react-body-highlighter'
 
 export default function Dashboard({ user }) {
@@ -193,56 +193,94 @@ export default function Dashboard({ user }) {
     setExercises(newEx)
   }
 
-  const calculateCalories = () => {
-    let totalCals = 0;
-    const UW = parseFloat(weight) || 85;
+  const calculateSetCalories = (exName, R, W, UW, isWarmup) => {
     const MOBILITY_FACTOR = 0.0025;
     const HEAVY_COMPOUND_BASE = 0.30;
     const HEAVY_COMPOUND_MULT = 0.005;
     const ISOLATION_BASE = 0.15;
     const ISOLATION_MULT = 0.002;
     const MET_ROWING = 7.0;
+    const MET_HIGH_KNEES = 8.0;
+    const MET_HOLLOW_ROCK = 4.0;
+    const MET_HIIT_SPRINT = 12.0;
+    const MET_PLANK = 4.0;
+    const MET_STAIRMASTER = 8.0;
+
+    let cals = 0;
+    if (isWarmup) {
+      if (exName.includes("Deep Squat Pry")) {
+        cals = (R / 60) * 3.5 * (UW / 60);
+      } else if (exName.includes("Pogo Jumps")) {
+        cals = (R / 60) * 5.0 * (UW / 60);
+      } else if (exName.includes("High-Knee Sprints") || exName.includes("Mountain Climbers")) {
+        cals = (R / 60) * MET_HIGH_KNEES * (UW / 60);
+      } else if (exName.includes("Hollow Body Rocks")) {
+        cals = (R / 60) * MET_HOLLOW_ROCK * (UW / 60);
+      } else {
+        const repsMultiplier = exName.includes("(per pos)") ? 3 : 1;
+        cals = (R * repsMultiplier) * (UW * MOBILITY_FACTOR);
+      }
+    } else {
+      const isHeavyCompound = [
+        "Barbell Back Squats", "Romanian Deadlifts", "Leg Press",
+        "Decline DB Press", "Weighted Dips", "Bent-Over Barbell Rows",
+        "Bent-Over Barbell Rows (Overhand Grip)", "Wide-Grip Pulldowns",
+        "Wide-Grip Lat Pulldowns", "Seated Overhead Press", 
+        "Seated Overhead Dumbbell Press", "Incline Barbell Bench", 
+        "Incline Barbell Bench Press", "Seated Cable Rows (Wide Grip)"
+      ].includes(exName);
+
+      if (exName.includes("Treadmill HIIT") || exName.includes("Assault Bike or Treadmill HIIT")) {
+        cals = R * MET_HIIT_SPRINT * (UW / 60);
+      } else if (exName.includes("Stairmaster") || exName.includes("High-Incline Walk")) {
+        cals = R * MET_STAIRMASTER * (UW / 60);
+      } else if (exName.includes("Rowing") || exName.includes("Cycling") || exName.includes("Assault Bike")) {
+        cals = R * MET_ROWING * (UW / 60);
+      } else if (exName.includes("Weighted Plank") || exName.includes("Plank")) {
+        cals = (R / 60) * MET_PLANK * (UW / 60);
+      } else if (isHeavyCompound) {
+        cals = (R * HEAVY_COMPOUND_BASE) + (R * W * HEAVY_COMPOUND_MULT) + (UW * 0.03);
+      } else {
+        cals = (R * ISOLATION_BASE) + (R * W * ISOLATION_MULT) + (UW * 0.015);
+      }
+    }
+    return cals;
+  };
+
+  const calculateCalories = () => {
+    let totalCals = 0;
+    const UW = parseFloat(weight) || 85;
 
     exercises.forEach(ex => {
       ex.setsData.forEach(set => {
         if (set.completed) {
           const R = parseInt(set.reps) || 0;
           const W = parseFloat(set.weight) || 0;
-          
-          if (ex.isWarmup) {
-            if (ex.name.includes("Deep Squat Pry")) {
-              totalCals += (R / 60) * 3.5 * (UW / 60);
-            } else if (ex.name.includes("Pogo Jumps")) {
-              totalCals += (R / 60) * 5.0 * (UW / 60);
-            } else if (ex.name.includes("High-Knee Sprints") || ex.name.includes("Mountain Climbers")) {
-              totalCals += (R / 60) * MET_ROWING * (UW / 60);
-            } else {
-              totalCals += R * (UW * MOBILITY_FACTOR);
-            }
-          } else {
-            const isCardio = ex.name.includes("Rowing") || ex.name.includes("Cycling") || ex.name.includes("Stairmaster") || ex.name.includes("Treadmill") || ex.name.includes("Assault Bike");
-            const isHeavyCompound = [
-              "Barbell Back Squats", "Romanian Deadlifts", "Leg Press",
-              "Decline DB Press", "Weighted Dips", "Bent-Over Barbell Rows",
-              "Bent-Over Barbell Rows (Overhand Grip)", "Wide-Grip Pulldowns",
-              "Wide-Grip Lat Pulldowns", "Seated Overhead Press", 
-              "Seated Overhead Dumbbell Press", "Incline Barbell Bench", 
-              "Incline Barbell Bench Press"
-            ].includes(ex.name);
-
-            if (isCardio) {
-              totalCals += R * MET_ROWING * (UW / 60); 
-            } else if (isHeavyCompound) {
-              totalCals += (R * HEAVY_COMPOUND_BASE) + (R * W * HEAVY_COMPOUND_MULT) + (UW * 0.03);
-            } else {
-              totalCals += (R * ISOLATION_BASE) + (R * W * ISOLATION_MULT) + (UW * 0.015);
-            }
-          }
+          totalCals += calculateSetCalories(ex.name, R, W, UW, ex.isWarmup);
         }
       })
     })
     return Math.round(totalCals);
   }
+
+  const calculateSingleSetCalories = (ex) => {
+    if (!ex) return 0;
+    
+    let R = 0;
+    let W = 0;
+    
+    if (ex.setsData && ex.setsData.length > 0) {
+      R = parseInt(ex.setsData[0].reps) || parseInt(ex.reps) || (ex.isWarmup ? 15 : 10);
+      W = parseFloat(ex.setsData[0].weight) || 0;
+    } else {
+      R = parseInt(ex.reps) || (ex.isWarmup ? 15 : 10);
+      W = 0;
+    }
+    
+    const UW = parseFloat(weight) || 85;
+    const cals = calculateSetCalories(ex.name, R, W, UW, ex.isWarmup);
+    return cals.toFixed(1);
+  };
 
   const saveDay = async () => {
     if (user.id === 'local-id') {
@@ -603,12 +641,16 @@ export default function Dashboard({ user }) {
                 )}
               </div>
               
-              <div style={{ background: '#111', padding: '10px', borderRadius: '8px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ background: '#111', padding: '10px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Model 
                   data={[{ name: infoModal.name, muscles: infoModal.targetMuscles || [] }]}
                   style={{ width: '12rem', padding: '1rem' }}
                   highlightedColors={['#FF6B00']}
                 />
+                <div style={{ marginTop: '10px', fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center', background: 'rgba(255,107,0,0.1)', padding: '6px 12px', borderRadius: '4px' }}>
+                  <Flame size={14} style={{ verticalAlign: 'middle', marginRight: '6px', color: '#FF6B00', marginBottom: '2px' }} />
+                  Est. Burn: <strong style={{ color: '#fff' }}>~{calculateSingleSetCalories(infoModal)} kcal</strong> <span style={{fontSize: '11px'}}>/ set</span>
+                </div>
               </div>
             </div>
           </div>
