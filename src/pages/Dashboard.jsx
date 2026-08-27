@@ -15,6 +15,8 @@ export default function Dashboard({ user }) {
   const [recentPage, setRecentPage] = useState(0)
   const [totalRecent, setTotalRecent] = useState(0)
   const [infoModal, setInfoModal] = useState(null)
+  const [addExModal, setAddExModal] = useState(false)
+  const [selectedAddDay, setSelectedAddDay] = useState(1)
 
   const currentPlan = blueprint.days.find(d => d.id === selectedDay)
 
@@ -498,6 +500,14 @@ export default function Dashboard({ user }) {
             </div>
           )}
 
+          <button 
+            onClick={() => { setAddExModal(true); setSelectedAddDay(selectedDay); }}
+            style={{ width: '100%', padding: '10px', marginTop: '10px', background: 'transparent', border: '1px dashed var(--accent-orange)', color: 'var(--accent-orange)', borderRadius: '8px', cursor: 'pointer' }}
+          >
+            <Plus size={16} style={{ verticalAlign: 'middle', marginRight: '5px' }} />
+            Add Exercise
+          </button>
+
           <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
             <button onClick={saveDay} style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
               {sessionSaved ? <CheckCircle size={18} /> : <Save size={18} />}
@@ -652,6 +662,72 @@ export default function Dashboard({ user }) {
                   Est. Burn: <strong style={{ color: '#fff' }}>~{calculateSingleSetCalories(infoModal)} kcal</strong> <span style={{fontSize: '11px'}}>/ set</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {addExModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+          background: 'rgba(0,0,0,0.8)', zIndex: 9999, 
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+        }}>
+          <div className="card" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
+            <button 
+              onClick={() => setAddExModal(false)}
+              style={{ position: 'absolute', right: '15px', top: '15px', background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}
+            >
+              <X size={24} />
+            </button>
+            <h2 style={{ color: 'var(--accent-orange)', marginBottom: '15px' }}>Add Exercise</h2>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>From Blueprint Day</label>
+              <select 
+                value={selectedAddDay} 
+                onChange={(e) => setSelectedAddDay(parseInt(e.target.value))}
+                style={{ width: '100%', padding: '10px', background: 'var(--bg-input)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px' }}
+              >
+                {blueprint.days.map(d => (
+                  <option key={d.id} value={d.id}>Day {d.id} - {d.type}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '400px', overflowY: 'auto' }}>
+              {(() => {
+                const dayPlan = blueprint.days.find(d => d.id === selectedAddDay);
+                if (!dayPlan) return null;
+                const allExercises = [...(dayPlan.warmup || []), ...(dayPlan.exercises || [])];
+                
+                return allExercises.map((ex, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(30,30,30,0.7)', padding: '10px', borderRadius: '4px', borderLeft: ex.isWarmup ? '3px solid #FF6B00' : 'none' }}>
+                    <div>
+                      <strong style={{ display: 'block', fontSize: '14px' }}>{ex.name}</strong>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{ex.muscle} {ex.isWarmup ? '(Warmup)' : ''}</span>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        const numSets = parseInt(ex.sets) || 1;
+                        const newEx = {
+                          ...ex,
+                          setsData: Array.from({ length: numSets }).map(() => ({
+                            reps: ex.reps || '',
+                            weight: ex.isWarmup ? '' : 10,
+                            completed: false
+                          }))
+                        };
+                        setExercises(prev => [...prev, newEx]);
+                        setAddExModal(false);
+                      }}
+                      style={{ padding: '5px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                    >
+                      <Plus size={14} /> Add
+                    </button>
+                  </div>
+                ))
+              })()}
             </div>
           </div>
         </div>
