@@ -14,9 +14,9 @@ export default function Login({ onLogin }) {
     const userLower = username.toLowerCase()
     const passLower = password.toLowerCase()
 
-    const validUsers = ['guest', 'vighnesh', 'aditi', 'aryan', 'ankur', 'viraj']
+    const validUsers = ['jeet', 'guest', 'vighnesh', 'aditi', 'aryan', 'ankur', 'viraj', 'sakshi']
     // As requested, simple auth checking
-    if ((userLower === 'jeet' && passLower === 'j') || (userLower === passLower && validUsers.includes(userLower))) {
+    if (userLower === passLower && validUsers.includes(userLower)) {
       
       // Let's also check if user exists in our supabase users table (since we seeded it)
       // If we don't have supabase connected yet, fallback to direct login for dev
